@@ -401,7 +401,8 @@ namespace WebserviceRest
                 return;
             }
             endpointMessage(Stream, ResponseHandler, HTTPrequest, UrlSplitBySlash, MessageList, ref MessageCounter);
-            Console.WriteLine("Thread finished");
+            Console.WriteLine("Thread finished and Client closed");
+            client.Close();         
             return;
         }
         static void Main(string[] args)
@@ -437,8 +438,7 @@ namespace WebserviceRest
                         if (item.Value.Join(20))
                         {
                             TempList.Add(item.Key);
-                            item.Key.Close();
-                            Console.WriteLine("One thread joined and connection closed");
+                            Console.WriteLine("One thread joined");
                         }
                     }
                     foreach (var item in TempList)
