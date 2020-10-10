@@ -1,0 +1,6 @@
+C:\Users\rothexD\source\repos\WebserviceRest\WebserviceRest\bin\Debug\WebserviceRest.exe.config
+C:\Users\rothexD\source\repos\WebserviceRest\WebserviceRest\bin\Debug\WebserviceRest.exe
+C:\Users\rothexD\source\repos\WebserviceRest\WebserviceRest\bin\Debug\WebserviceRest.pdb
+C:\Users\rothexD\source\repos\WebserviceRest\WebserviceRest\obj\Debug\WebserviceRest.csprojAssemblyReference.cache
+C:\Users\rothexD\source\repos\WebserviceRest\WebserviceRest\obj\Debug\WebserviceRest.exe
+C:\Users\rothexD\source\repos\WebserviceRest\WebserviceRest\obj\Debug\WebserviceRest.pdb
