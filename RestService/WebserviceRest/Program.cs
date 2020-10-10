@@ -205,6 +205,8 @@ namespace WebserviceRest
     }
     class Program
     {
+        private static Mutex MessageListMutex = new Mutex();
+        private static Mutex MessageCounterMutex = new Mutex();
         static public void endpointMessage(NetworkStream Stream,HTTPResponseWrapper ResponseHandler, RequestContext HTTPrequest,string[] EndPointArray, Dictionary<int, string> MessageList,ref int MessageCounter)
         {
             switch (HTTPrequest.HTTPVerb)
@@ -214,10 +216,12 @@ namespace WebserviceRest
                     {
                         string Response = "";
                         //https://stackoverflow.com/questions/141088/what-is-the-best-way-to-iterate-over-a-dictionary
+                        MessageListMutex.WaitOne();
                         foreach (KeyValuePair<int, string> MessageKeyValuePair in MessageList)
                         {
                             Response += $"Message { MessageKeyValuePair.Key }: {MessageKeyValuePair.Value}\n";
                         }
+                        MessageListMutex.ReleaseMutex();
                         //respond with OK Message
                         ResponseHandler.SendDefaultMessage(Stream, "200", Response);
                         break;
@@ -228,8 +232,10 @@ namespace WebserviceRest
                         if (MessageIDFromHttpRequest != -1)
                         {
                             string Output = "";
+                            MessageListMutex.WaitOne();
                             if (MessageList.TryGetValue(MessageIDFromHttpRequest, out Output))
                             {
+                                MessageListMutex.ReleaseMutex();
                                 string Response = $"Message {MessageIDFromHttpRequest}: {Output}\n";
                                 //respond with OK Message
                                 ResponseHandler.SendDefaultMessage(Stream, "200", Response);
@@ -237,6 +243,7 @@ namespace WebserviceRest
                             }
                             else
                             {
+                                MessageListMutex.ReleaseMutex();
                                 //respond Message not found;
                                 ResponseHandler.SendDefaultStatus(Stream, "404");
                                 break;
@@ -258,9 +265,12 @@ namespace WebserviceRest
                 case ("POST"):
                     if (EndPointArray.Length == 2 && EndPointArray[1] == "messages")
                     {
+                        MessageListMutex.WaitOne();
                         MessageList.Add(MessageCounter, HTTPrequest.PayLoad.Trim('\n'));
-                        ResponseHandler.SendDefaultMessage(Stream, "201", MessageCounter.ToString());
+                        int tempMessageCounter = MessageCounter;
                         MessageCounter++;
+                        MessageListMutex.ReleaseMutex();
+                        ResponseHandler.SendDefaultMessage(Stream, "201", tempMessageCounter.ToString());                 
                         break;
                     }
                     else
@@ -275,14 +285,17 @@ namespace WebserviceRest
                         int MessageIDFromHttpRequest = ToInt(EndPointArray[2]);
                         if (MessageIDFromHttpRequest != -1)
                         {
+                            MessageListMutex.WaitOne();
                             if (MessageList.ContainsKey(MessageIDFromHttpRequest))
                             {
                                 MessageList.Remove(MessageIDFromHttpRequest);
+                                MessageListMutex.ReleaseMutex();                              
                                 ResponseHandler.SendDefaultStatus(Stream, "200");
                                 break;
                             }
                             else
                             {
+                                MessageListMutex.ReleaseMutex();
                                 //respond with bad MessageEndPoint
                                 ResponseHandler.SendDefaultStatus(Stream, "404");
                                 break;
@@ -307,15 +320,18 @@ namespace WebserviceRest
                         int MessageIDFromHttpRequest = ToInt(EndPointArray[2]);
                         if (MessageIDFromHttpRequest != -1)
                         {
+                            MessageListMutex.WaitOne();
                             if (MessageList.ContainsKey(MessageIDFromHttpRequest))
                             {
                                 MessageList[MessageIDFromHttpRequest] = HTTPrequest.PayLoad;
+                                MessageListMutex.ReleaseMutex();
                                 //respond with ok
                                 ResponseHandler.SendDefaultStatus(Stream, "200");
                                 break;
                             }
                             else
                             {
+                                MessageListMutex.ReleaseMutex();
                                 //respond with bad MessageEndPoint
                                 ResponseHandler.SendDefaultStatus(Stream, "404");
                                 break;
@@ -351,6 +367,43 @@ namespace WebserviceRest
                 return -1;
             }
         }
+        static void ProcessConnection(ref Mutex MessageListMutex,ref int MessageCounter,ref Dictionary<int, string> MessageList, TcpClient client)
+        {
+            NetworkStream Stream = client.GetStream();
+            RequestContext HTTPrequest = new RequestContext();
+            HTTPResponseWrapper ResponseHandler = new HTTPResponseWrapper();
+
+            if (HTTPrequest.Parse(Stream))
+            {
+                /*
+                Console.WriteLine("HTTP-Verb: " + HTTPrequest.HTTPVerb);
+                Console.WriteLine("HttpProtokoll: " + HTTPrequest.HttpProtokoll);
+                Console.WriteLine("MessageEndPoint: " + HTTPrequest.MessageEndPoint);
+                HTTPrequest.printdictionary();
+                if (HTTPrequest.PayLoad.Length > 0)
+                {
+                    Console.WriteLine("PayLoad " + HTTPrequest.PayLoad.Length + ":\n" + HTTPrequest.PayLoad + "");
+                }
+                */
+            }
+            else
+            {
+                ResponseHandler.SendDefaultStatus(Stream, "400");
+                client.Close();
+                return;
+            }
+            string[] UrlSplitBySlash = HTTPrequest.ResolveEndPointToStringArray();
+            if (UrlSplitBySlash.Length <= 1)
+            {
+                //respond with error MessageEndPoint not exists                   
+                ResponseHandler.SendDefaultStatus(Stream, "404");
+                client.Close();
+                return;
+            }
+            endpointMessage(Stream, ResponseHandler, HTTPrequest, UrlSplitBySlash, MessageList, ref MessageCounter);
+            Console.WriteLine("Thread finished");
+            return;
+        }
         static void Main(string[] args)
         {
             TcpListener Server = null;
@@ -358,8 +411,6 @@ namespace WebserviceRest
             int Port = 1235;
             Server = new TcpListener(MyAdress, Port);
             Server.Start();
-            RequestContext HTTPrequest = new RequestContext();
-            HTTPResponseWrapper ResponseHandler = new HTTPResponseWrapper();
             Dictionary<int,string> MessageList = new Dictionary<int, string>();
             Byte[] bytes = new Byte[256];
             int MessageCounter = 0;
@@ -367,47 +418,34 @@ namespace WebserviceRest
             MessageCounter++;
             MessageList.Add(1, "Test");
             MessageCounter++;
+            Dictionary<TcpClient,Thread> ThreadList = new Dictionary<TcpClient, Thread>();
             while (true)
             {
-                Console.Write("Waiting for a connection... ");
+                Console.WriteLine("Waiting for a connection... ");
 
-                // Perform a blocking call to accept requests.
-                // You could also use server.AcceptSocket() here.
-                TcpClient client = Server.AcceptTcpClient();
-                Console.WriteLine("Connected!");
+                    TcpClient client = Server.AcceptTcpClient();
+                    Console.WriteLine("Connected!");
+                    Thread ThreadToProcessClient = new Thread(delegate () { ProcessConnection(ref MessageListMutex, ref MessageCounter, ref MessageList, client); });
+                    ThreadList.Add(client, ThreadToProcessClient);
+                    ThreadToProcessClient.Start();
 
-                // Get a stream object for reading and writing
-                NetworkStream Stream = client.GetStream();
+                    Console.WriteLine("Clean Up");
 
-
-                if (HTTPrequest.Parse(Stream))
-                {
-                    Console.WriteLine("HTTP-Verb: "+HTTPrequest.HTTPVerb);
-                    Console.WriteLine("HttpProtokoll: "+HTTPrequest.HttpProtokoll);
-                    Console.WriteLine("MessageEndPoint: "+HTTPrequest.MessageEndPoint);                  
-                    HTTPrequest.printdictionary();
-                    if (HTTPrequest.PayLoad.Length > 0)
+                    List<TcpClient>TempList = new List<TcpClient>();
+                    foreach (var item in ThreadList)
                     {
-                        Console.WriteLine("PayLoad "+HTTPrequest.PayLoad.Length+":\n" + HTTPrequest.PayLoad + "");
-                    }                  
-                }
-                else
-                {
-                    ResponseHandler.SendDefaultStatus(Stream,"400");
-                    client.Close();
-                    continue;
-                }
-                string[] UrlSplitBySlash = HTTPrequest.ResolveEndPointToArray();
-                if(UrlSplitBySlash.Length <= 1)
-                {
-                    //respond with error MessageEndPoint not exists                   
-                    ResponseHandler.SendDefaultStatus(Stream, "404");
-                    client.Close();
-                    continue;
-                }
-                endpointMessage(Stream, ResponseHandler, HTTPrequest, UrlSplitBySlash, MessageList,ref MessageCounter);
-                Console.WriteLine("Client closed");
-                client.Close();
+                        if (item.Value.Join(20))
+                        {
+                            TempList.Add(item.Key);
+                            item.Key.Close();
+                            Console.WriteLine("One thread joined and connection closed");
+                        }
+                    }
+                    foreach (var item in TempList)
+                    {
+                    ThreadList.Remove(item);
+                    Console.WriteLine("Removed thread from List");
+                    }
             }
         }
     }
