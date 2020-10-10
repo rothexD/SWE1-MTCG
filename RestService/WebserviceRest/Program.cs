@@ -24,6 +24,10 @@ namespace WebserviceRest
             Headers = new Dictionary<string, string>();
             ResetContext();
         }
+        public string[] ResolveEndPointToStringArray()
+        {
+            return MessageEndPoint.Split('/');
+        }
         public void ResetContext()
         {
             //https://stackoverflow.com/questions/1978821/how-to-reset-a-dictionary
@@ -393,7 +397,7 @@ namespace WebserviceRest
                     client.Close();
                     continue;
                 }
-                string[] UrlSplitBySlash = HTTPrequest.MessageEndPoint.Split('/');
+                string[] UrlSplitBySlash = HTTPrequest.ResolveEndPointToArray();
                 if(UrlSplitBySlash.Length <= 1)
                 {
                     //respond with error MessageEndPoint not exists                   
