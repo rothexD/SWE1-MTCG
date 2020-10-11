@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MonsterTradingCardGame.Cards.MonsterCards
+namespace MCTG.Cards.MonsterCards
 {
     public class Dragon : Card
     {

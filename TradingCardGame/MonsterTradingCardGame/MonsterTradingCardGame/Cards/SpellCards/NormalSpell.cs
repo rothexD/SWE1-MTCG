@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MonsterTradingCardGame.Cards.SpellCards
+namespace MCTG.Cards.SpellCards
 {
     public class NormalSpell : Card
     {

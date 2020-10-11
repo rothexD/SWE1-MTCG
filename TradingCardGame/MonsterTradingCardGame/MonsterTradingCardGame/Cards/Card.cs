@@ -1,4 +1,4 @@
-﻿namespace MonsterTradingCardGame.Cards
+﻿namespace MCTG.Cards
 {
     public abstract class Card
     {
