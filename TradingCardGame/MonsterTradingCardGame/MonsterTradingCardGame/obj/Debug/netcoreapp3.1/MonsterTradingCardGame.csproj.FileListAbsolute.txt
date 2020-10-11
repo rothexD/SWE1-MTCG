@@ -1,0 +1,11 @@
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\TradingCardGame\MonsterTradingCardGame\MonsterTradingCardGame\bin\Debug\netcoreapp3.1\MonsterTradingCardGame.exe
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\TradingCardGame\MonsterTradingCardGame\MonsterTradingCardGame\bin\Debug\netcoreapp3.1\MonsterTradingCardGame.deps.json
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\TradingCardGame\MonsterTradingCardGame\MonsterTradingCardGame\bin\Debug\netcoreapp3.1\MonsterTradingCardGame.runtimeconfig.json
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\TradingCardGame\MonsterTradingCardGame\MonsterTradingCardGame\bin\Debug\netcoreapp3.1\MonsterTradingCardGame.runtimeconfig.dev.json
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\TradingCardGame\MonsterTradingCardGame\MonsterTradingCardGame\bin\Debug\netcoreapp3.1\MonsterTradingCardGame.dll
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\TradingCardGame\MonsterTradingCardGame\MonsterTradingCardGame\bin\Debug\netcoreapp3.1\MonsterTradingCardGame.pdb
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\TradingCardGame\MonsterTradingCardGame\MonsterTradingCardGame\obj\Debug\netcoreapp3.1\MonsterTradingCardGame.csprojAssemblyReference.cache
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\TradingCardGame\MonsterTradingCardGame\MonsterTradingCardGame\obj\Debug\netcoreapp3.1\MonsterTradingCardGame.AssemblyInfoInputs.cache
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\TradingCardGame\MonsterTradingCardGame\MonsterTradingCardGame\obj\Debug\netcoreapp3.1\MonsterTradingCardGame.AssemblyInfo.cs
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\TradingCardGame\MonsterTradingCardGame\MonsterTradingCardGame\obj\Debug\netcoreapp3.1\MonsterTradingCardGame.dll
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\TradingCardGame\MonsterTradingCardGame\MonsterTradingCardGame\obj\Debug\netcoreapp3.1\MonsterTradingCardGame.pdb
