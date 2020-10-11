@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MonsterTradingCardGame.Cards
+﻿namespace MonsterTradingCardGame.Cards
 {
-    abstract class Card
+    public abstract class Card
     {
         public enum CardelEmentEnum
         {
@@ -21,7 +17,7 @@ namespace MonsterTradingCardGame.Cards
 
         protected float ElementMultiplikator(Card OpponentCard)
         {
-            if(this.CardElement == OpponentCard.CardElement)
+            if (this.CardElement == OpponentCard.CardElement)
             {
                 return 1;
             }

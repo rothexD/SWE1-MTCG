@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MonsterTradingCardGame.Cards.MonsterCards
 {
-    class FireElve : Card
+    public class FireElve : Card
     {
-        FireElve(int Basedamage, string Name, int CardId, CardelEmentEnum Element) : base(CardId)
+        public FireElve(int Basedamage, string Name, int CardId, CardelEmentEnum Element) : base(CardId)
         {
             this.BaseDamage = Basedamage;
             this.CardName = Name;
             this.CardType = "FireElve";
-            this.CardType = "Monster";
+            this.CardStyle = "Monster";
             this.CardElement = Element;
         }
         public override int CalculateDamage(Card OpponentsCard)

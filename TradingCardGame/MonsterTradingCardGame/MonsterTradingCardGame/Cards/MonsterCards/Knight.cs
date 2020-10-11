@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MonsterTradingCardGame.Cards.MonsterCards
 {
-    class Knight : Card
+    public class Knight : Card
     {
-        Knight(int Basedamage, string Name, int CardId, CardelEmentEnum Element) : base(CardId)
+        public Knight(int Basedamage, string Name, int CardId, CardelEmentEnum Element) : base(CardId)
         {
             this.BaseDamage = Basedamage;
             this.CardName = Name;
@@ -15,19 +13,20 @@ namespace MonsterTradingCardGame.Cards.MonsterCards
             this.CardElement = Element;
         }
         public override int CalculateDamage(Card OpponentsCard)
-        {     
-            if(OpponentsCard.CardStyle == "Monster")
+        {
+            if (OpponentsCard.CardStyle == "Monster")
             {
                 return this.BaseDamage;
             }
-            else if(OpponentsCard.CardStyle == "Spell")
+            else if (OpponentsCard.CardStyle == "Spell")
             {
                 if (OpponentsCard.CardType == "WaterSpell")
                 {
                     return 0;
                 }
                 return Convert.ToInt32(this.BaseDamage * ElementMultiplikator(OpponentsCard));
-            }else
+            }
+            else
             {
                 return -1;
             }

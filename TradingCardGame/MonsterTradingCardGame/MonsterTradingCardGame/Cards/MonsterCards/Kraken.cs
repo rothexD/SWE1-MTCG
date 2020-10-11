@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MonsterTradingCardGame.Cards.MonsterCards
 {
-    class Kraken : Card
+    public class Kraken : Card
     {
-        Kraken(int Basedamage, string Name, int CardId, CardelEmentEnum Element) : base(CardId)
+        public Kraken(int Basedamage, string Name, int CardId, CardelEmentEnum Element) : base(CardId)
         {
             this.BaseDamage = Basedamage;
             this.CardName = Name;
@@ -20,7 +18,7 @@ namespace MonsterTradingCardGame.Cards.MonsterCards
             {
                 return this.BaseDamage;
             }
-            else if(OpponentsCard.CardStyle=="Spell")
+            else if (OpponentsCard.CardStyle == "Spell")
             {
                 return Convert.ToInt32(this.BaseDamage * ElementMultiplikator(OpponentsCard));
             }

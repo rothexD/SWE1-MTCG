@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MonsterTradingCardGame.Cards.MonsterCards
 {
-    class Dragon : Card
+    public class Dragon : Card
     {
         private Random RandomNumberGenerator = new Random();
-        Dragon(int Basedamage, string Name,int CardId, CardelEmentEnum Element) : base(CardId)
+        public Dragon(int Basedamage, string Name, int CardId, CardelEmentEnum Element) : base(CardId)
         {
             this.BaseDamage = Basedamage;
             this.CardName = Name;
             this.CardType = "Dragon";
-            this.CardType = "Monster";
+            this.CardStyle = "Monster";
             this.CardElement = Element;
         }
         public override int CalculateDamage(Card OpponentsCard)
@@ -21,15 +19,7 @@ namespace MonsterTradingCardGame.Cards.MonsterCards
             {
                 if (OpponentsCard.CardType == "FireElve")
                 {
-                    int randomInt = RandomNumberGenerator.Next(0, 100);
-                    if (randomInt > 20)
-                    {
-                        return 0;
-                    }
-                    else
-                    {
-                        return this.BaseDamage;
-                    }
+                    return 0;
                 }
                 return this.BaseDamage;
             }

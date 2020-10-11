@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MonsterTradingCardGame.Cards.MonsterCards
 {
-    class Wizzard : Card
+    public class Wizzard : Card
     {
-        Wizzard(int Basedamage, string Name, int CardId, CardelEmentEnum Element) : base(CardId)
+        public Wizzard(int Basedamage, string Name, int CardId, CardelEmentEnum Element) : base(CardId)
         {
             this.BaseDamage = Basedamage;
             this.CardName = Name;
@@ -16,7 +14,7 @@ namespace MonsterTradingCardGame.Cards.MonsterCards
         }
         public override int CalculateDamage(Card OpponentsCard)
         {
-            if(OpponentsCard.CardStyle== "Monster")
+            if (OpponentsCard.CardStyle == "Monster")
             {
                 return this.BaseDamage;
             }

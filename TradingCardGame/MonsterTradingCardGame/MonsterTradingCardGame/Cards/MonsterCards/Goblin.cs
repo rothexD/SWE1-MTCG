@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MonsterTradingCardGame.Cards.MonsterCards
 {
-    class Goblin : Card
+    public class Goblin : Card
     {
-        Goblin(int Basedamage, string Name, int CardId, CardelEmentEnum Element) : base(CardId)
+        public Goblin(int Basedamage, string Name, int CardId, CardelEmentEnum Element) : base(CardId)
         {
             this.BaseDamage = Basedamage;
             this.CardName = Name;
             this.CardType = "Goblin";
-            this.CardType = "Monster";
+            this.CardStyle = "Monster";
             this.CardElement = Element;
         }
         public override int CalculateDamage(Card OpponentsCard)
