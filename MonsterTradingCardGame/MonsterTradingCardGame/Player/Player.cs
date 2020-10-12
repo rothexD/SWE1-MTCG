@@ -19,7 +19,7 @@ namespace MCTG.Player
         Failed
     }
     public class Player
-    {
+    {  
         public string PlayerName { get; private set; }
         public int Win { get; private set; }
         public int Lose { get; private set; }
@@ -49,7 +49,18 @@ namespace MCTG.Player
                 throw new ArgumentException("To many cards in Deck Parameter (max5)");
             }
             this.Stack = new Dictionary<int, Card>(Stack);
-            this.Deck = new Dictionary<int, Card>(Deck);
+            this.Deck = new Dictionary<int, Card>();
+            foreach (KeyValuePair<int,Card> IndividualEntry in Deck)
+            {
+                if (!Stack.ContainsKey(IndividualEntry.Value.CardId))
+                {
+                    this.Deck.Add(IndividualEntry.Key, IndividualEntry.Value);
+                }
+                else
+                {
+                    throw new ArgumentException("Combination of Deck and Set not unique");
+                }
+            }                    
             this.Coins = Coins;
             this.Elo = Elo;
             this.Win = Win;
@@ -83,16 +94,16 @@ namespace MCTG.Player
         public DeckAndStackStatus AddToStack(Card CardInstance)
         {
             PlayerMutex.WaitOne();
-            if (!Stack.ContainsKey(CardInstance.CardId))
+            if (Stack.ContainsKey(CardInstance.CardId)||Deck.ContainsKey(CardInstance.CardId))
+            {
+                PlayerMutex.ReleaseMutex();
+                return DeckAndStackStatus.UserAlreadyOwnsCard;              
+            }
+            else
             {
                 Stack.Add(CardInstance.CardId, CardInstance);
                 PlayerMutex.ReleaseMutex();
                 return DeckAndStackStatus.Success;
-            }
-            else
-            {
-                PlayerMutex.ReleaseMutex();
-                return DeckAndStackStatus.CardAlreadyInStack;
             }
         }
         public DeckAndStackStatus RemoveFromStack(int CardId)

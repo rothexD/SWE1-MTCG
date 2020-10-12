@@ -36,7 +36,7 @@ namespace MonsterTradingCardGame.tests
         [Test]
         public void TestFireElve()
         {
-
+            Assert.Pass();
         }
         [Test]
         public void TestGoblin()
@@ -81,7 +81,7 @@ namespace MonsterTradingCardGame.tests
         [Test]
         public void TestWizzard()
         {
-
+            Assert.Pass();
         }
         [Test]
         public void TestElementalDamageCalculation()
