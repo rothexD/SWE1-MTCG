@@ -11,6 +11,47 @@ using System.Net.Sockets;
  */
 namespace WebserviceRest
 {
+    class ServerTcpListener
+    {
+        public TcpListener Server { get; private set; }
+        public IPAddress Adress { get; private set; }
+        public int Port = 1235;
+
+
+        public ServerTcpListener()
+        {      
+            Adress = IPAddress.Parse("127.0.0.1");
+            Port = 1235;
+            Server = new TcpListener(Adress, Port);
+        }
+        public ServerTcpListener(string MyAdress,int Port)
+        {
+            this.Adress = IPAddress.Parse(MyAdress);
+            this.Port = Port;
+            Server = new TcpListener(Adress, Port);
+        }
+        public void StartServer()
+        {
+            Server.Start();
+        }
+        public TcpClient ListenForConnection()
+        {
+            return Server.AcceptTcpClient();
+        }
+        public RequestContext GetRequestInformationFromConnection(TcpClient Client)
+        {
+            NetworkStream Stream = Client.GetStream();
+            RequestContext RequestInformation = new RequestContext(Client, Stream);
+            if (RequestInformation.Parse())
+            {
+                return RequestInformation;
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
     class RequestContext
     {
         //https://stackoverflow.com/questions/21312870/how-to-access-private-variables-using-get-set
@@ -19,10 +60,18 @@ namespace WebserviceRest
         public string MessageEndPoint { get; private set; }
         public Dictionary<string, string> Headers { get; private set; }
         public string PayLoad { get; private set; }
-        public RequestContext()
+        public TcpClient Client { get; private set; } 
+        public NetworkStream Stream { get; private set; }
+        public RequestContext(TcpClient Client,NetworkStream Stream)
         {
+            this.Client = Client;
+            this.Stream = Stream;
             Headers = new Dictionary<string, string>();
-            ResetContext();
+            HTTPVerb = "";
+            HttpProtokoll = "";
+            MessageEndPoint = "";
+            Headers.Clear();
+            PayLoad = "";
         }
         public string[] ResolveEndPointToStringArray()
         {
@@ -50,7 +99,7 @@ namespace WebserviceRest
                 return null;
             }
         }
-        public bool Parse(NetworkStream Stream)
+        public bool Parse()
         {
             ResetContext();
             Byte[] bytes = new Byte[4096];
@@ -186,7 +235,7 @@ namespace WebserviceRest
             {
                 return false;
             }
-             string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}Cache-Control: no-cache\nDate: {DateTime.Now}\nConnection: Closed";
+             string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\nCache-Control: no-cache\nDate: {DateTime.Now}\nConnection: Closed";
              byte[] msg = System.Text.Encoding.ASCII.GetBytes(Response);
              Stream.Write(msg, 0, msg.Length);
              return true;
@@ -367,13 +416,13 @@ namespace WebserviceRest
                 return -1;
             }
         }
-        static void ProcessConnection(ref Mutex MessageListMutex,ref int MessageCounter,ref Dictionary<int, string> MessageList, TcpClient client)
+        static void ProcessConnection(ref Mutex MessageListMutex,ref int MessageCounter,ref Dictionary<int, string> MessageList,ServerTcpListener Server, TcpClient client)
         {
-            NetworkStream Stream = client.GetStream();
-            RequestContext HTTPrequest = new RequestContext();
+            RequestContext HTTPrequest = Server.GetRequestInformationFromConnection(client);
+           
             HTTPResponseWrapper ResponseHandler = new HTTPResponseWrapper();
 
-            if (HTTPrequest.Parse(Stream))
+            if (HTTPrequest != null)
             {
                 /*
                 Console.WriteLine("HTTP-Verb: " + HTTPrequest.HTTPVerb);
@@ -388,7 +437,7 @@ namespace WebserviceRest
             }
             else
             {
-                ResponseHandler.SendDefaultStatus(Stream, "400");
+                ResponseHandler.SendDefaultStatus(HTTPrequest.Stream, "400");
                 client.Close();
                 return;
             }
@@ -396,22 +445,17 @@ namespace WebserviceRest
             if (UrlSplitBySlash.Length <= 1)
             {
                 //respond with error MessageEndPoint not exists                   
-                ResponseHandler.SendDefaultStatus(Stream, "404");
+                ResponseHandler.SendDefaultStatus(HTTPrequest.Stream, "404");
                 client.Close();
                 return;
             }
-            endpointMessage(Stream, ResponseHandler, HTTPrequest, UrlSplitBySlash, MessageList, ref MessageCounter);
+            endpointMessage(HTTPrequest.Stream, ResponseHandler, HTTPrequest, UrlSplitBySlash, MessageList, ref MessageCounter);
             Console.WriteLine("Thread finished and Client closed");
             client.Close();         
             return;
         }
         static void Main(string[] args)
-        {
-            TcpListener Server = null;
-            IPAddress MyAdress = IPAddress.Parse("127.0.0.1");
-            int Port = 1235;
-            Server = new TcpListener(MyAdress, Port);
-            Server.Start();
+        {          
             Dictionary<int,string> MessageList = new Dictionary<int, string>();
             Byte[] bytes = new Byte[256];
             int MessageCounter = 0;
@@ -420,13 +464,13 @@ namespace WebserviceRest
             MessageList.Add(1, "Test");
             MessageCounter++;
             Dictionary<TcpClient,Thread> ThreadList = new Dictionary<TcpClient, Thread>();
+            ServerTcpListener Server = new ServerTcpListener();
+            Server.StartServer();
             while (true)
-            {
-                Console.WriteLine("Waiting for a connection... ");
-
-                    TcpClient client = Server.AcceptTcpClient();
-                    Console.WriteLine("Connected!");
-                    Thread ThreadToProcessClient = new Thread(delegate () { ProcessConnection(ref MessageListMutex, ref MessageCounter, ref MessageList, client); });
+            {               
+                    Console.WriteLine("Waiting for a connection... ");
+                    TcpClient client = Server.ListenForConnection();
+                    Thread ThreadToProcessClient = new Thread(delegate () { ProcessConnection(ref MessageListMutex, ref MessageCounter, ref MessageList,Server, client); });
                     ThreadList.Add(client, ThreadToProcessClient);
                     ThreadToProcessClient.Start();
 
