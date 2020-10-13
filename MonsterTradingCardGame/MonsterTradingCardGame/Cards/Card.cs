@@ -14,7 +14,7 @@
         public string CardStyle { get; protected set; }
         public CardelEmentEnum CardElement { get; protected set; }
         public int CardId { get; private set; }
-
+        public string AttackMoveName { get; protected set; }
         protected float ElementMultiplikator(Card OpponentCard)
         {
             if (this.CardElement == OpponentCard.CardElement)

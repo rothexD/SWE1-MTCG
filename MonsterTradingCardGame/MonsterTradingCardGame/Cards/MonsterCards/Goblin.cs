@@ -11,6 +11,7 @@ namespace MCTG.Cards.MonsterCards
             this.CardType = "Goblin";
             this.CardStyle = "Monster";
             this.CardElement = Element;
+            this.AttackMoveName = "crazy speed";
         }
         public override int CalculateDamage(Card OpponentsCard)
         {

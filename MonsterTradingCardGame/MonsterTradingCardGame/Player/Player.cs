@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading;
 using MCTG.Cards;
 
-namespace MCTG.Player
+namespace MCTG.Players
 {
     public enum DeckAndStackStatus
     {

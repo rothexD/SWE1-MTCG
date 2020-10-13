@@ -11,6 +11,7 @@ namespace MCTG.Cards.SpellCards
             this.CardType = "NormalSpell";
             this.CardStyle = "Spell";
             this.CardElement = Element;
+            this.AttackMoveName = "Magic";
         }
         public override int CalculateDamage(Card OpponentsCard)
         {

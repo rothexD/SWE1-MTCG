@@ -9,6 +9,8 @@ namespace MCTG
         static void Main(string[] parameter)
         {
             Console.Write("abc");
+            Random Dice = new Random();
+            Console.WriteLine(Dice.Next(0, 0));
             Console.ReadLine();
             return;
         }

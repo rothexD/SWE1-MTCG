@@ -12,6 +12,7 @@ namespace MCTG.Cards.MonsterCards
             this.CardType = "Dragon";
             this.CardStyle = "Monster";
             this.CardElement = Element;
+            this.AttackMoveName = "flyingkick";
         }
         public override int CalculateDamage(Card OpponentsCard)
         {

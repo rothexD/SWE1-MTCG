@@ -1,5 +1,5 @@
-using NUnit.Framework;
-using MCTG.Player;
+﻿using NUnit.Framework;
+using MCTG.Players;
 using MCTG.Cards;
 using MCTG.Cards.MonsterCards;
 using MCTG.Cards.SpellCards;
@@ -10,7 +10,7 @@ using System.Text;
 namespace NunitTests
 {
     public class PlayerTests
-    {       
+    {
         [Test]
         public void testConstructor()
         {
@@ -38,7 +38,7 @@ namespace NunitTests
             {
                 Player User = new Player("Lukas", 0, 0, 0, 20, 100, Stack, Deck);
             }
-            catch(ArgumentException e)
+            catch (ArgumentException e)
             {
                 FirstTryCatch = true;
                 Assert.Pass(e.Message);
@@ -48,7 +48,7 @@ namespace NunitTests
             {
                 Player User = new Player("Lukas", 0, 0, 0, 20, 100, Stack, Deck);
             }
-            catch(ArgumentException e)
+            catch (ArgumentException e)
             {
                 SecondTryCatch = true;
                 Assert.Pass(e.Message);
@@ -96,7 +96,7 @@ namespace NunitTests
             Card WaterSpell = new WaterSpell(10, "spell", 2, Card.CardelEmentEnum.water);
             Dictionary<int, Card> Deck = new Dictionary<int, Card>();
             Dictionary<int, Card> Stack = new Dictionary<int, Card>();
-            
+
             //-------------------------------------------------------------------
             Deck.Add(Ork.CardId, Ork);
             Deck.Add(Wizzard.CardId, Wizzard);
@@ -134,7 +134,7 @@ namespace NunitTests
             Stack.Add(NormalSpell.CardId, NormalSpell);
             Stack.Add(knight.CardId, knight);
             Player User = new Player("Lukas", 0, 0, 0, 20, 100, Stack, Deck);
-            Console.WriteLine(User.Stack.Count+" "+ User.Deck.Count);
+            Console.WriteLine(User.Stack.Count + " " + User.Deck.Count);
 
             DeckAndStackStatus DeckFull = User.MoveFromStackToDeck(Wizzard.CardId);
 
@@ -147,7 +147,7 @@ namespace NunitTests
             //--------------------------------------------------------------------------------
 
             Assert.AreEqual(DeckAndStackStatus.Success, Success);
-            Assert.AreEqual(DeckAndStackStatus.DeckIsFull, DeckFull);    
+            Assert.AreEqual(DeckAndStackStatus.DeckIsFull, DeckFull);
             Assert.AreEqual(DeckAndStackStatus.CardNotInStack, FailureCardNotInStack);
         }
         [Test]
@@ -157,15 +157,15 @@ namespace NunitTests
             Card WaterSpell = new WaterSpell(10, "spell", 3, Card.CardelEmentEnum.water);
             Player User = new Player("Lukas", 0, 0, 0, 20, 100);
 
-            DeckAndStackStatus Success = User.UserAttemptsCardPurchase(Ork,20);
-            DeckAndStackStatus CardAlreadyOwned = User.UserAttemptsCardPurchase(Ork,20);
+            DeckAndStackStatus Success = User.UserAttemptsCardPurchase(Ork, 20);
+            DeckAndStackStatus CardAlreadyOwned = User.UserAttemptsCardPurchase(Ork, 20);
             DeckAndStackStatus NotEnoughCoins = User.UserAttemptsCardPurchase(WaterSpell, 20);
 
 
             Assert.AreEqual(DeckAndStackStatus.Success, Success);
             Assert.AreEqual(DeckAndStackStatus.UserAlreadyOwnsCard, CardAlreadyOwned);
             Assert.AreEqual(DeckAndStackStatus.NotEnoughCoins, NotEnoughCoins);
-        }       
+        }
 
     }
 }

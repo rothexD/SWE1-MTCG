@@ -11,6 +11,7 @@ namespace MCTG.Cards.MonsterCards
             this.CardType = "Wizzard";
             this.CardStyle = "Monster";
             this.CardElement = Element;
+            this.AttackMoveName = "ancient magic";
         }
         public override int CalculateDamage(Card OpponentsCard)
         {

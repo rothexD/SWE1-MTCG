@@ -11,6 +11,7 @@ namespace MCTG.Cards.MonsterCards
             this.CardType = "FireElve";
             this.CardStyle = "Monster";
             this.CardElement = Element;
+            this.AttackMoveName = "Sneaky Dagger";
         }
         public override int CalculateDamage(Card OpponentsCard)
         {

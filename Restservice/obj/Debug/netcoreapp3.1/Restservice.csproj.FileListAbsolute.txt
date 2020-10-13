@@ -1,0 +1,10 @@
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\Restservice\bin\Debug\netcoreapp3.1\Restservice.exe
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\Restservice\bin\Debug\netcoreapp3.1\Restservice.deps.json
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\Restservice\bin\Debug\netcoreapp3.1\Restservice.runtimeconfig.json
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\Restservice\bin\Debug\netcoreapp3.1\Restservice.runtimeconfig.dev.json
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\Restservice\bin\Debug\netcoreapp3.1\Restservice.dll
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\Restservice\bin\Debug\netcoreapp3.1\Restservice.pdb
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\Restservice\obj\Debug\netcoreapp3.1\Restservice.AssemblyInfoInputs.cache
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\Restservice\obj\Debug\netcoreapp3.1\Restservice.AssemblyInfo.cs
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\Restservice\obj\Debug\netcoreapp3.1\Restservice.dll
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\Restservice\obj\Debug\netcoreapp3.1\Restservice.pdb

@@ -11,6 +11,7 @@ namespace MCTG.Cards.MonsterCards
             this.CardType = "Ork";
             this.CardStyle = "Monster";
             this.CardElement = Element;
+            this.AttackMoveName = "berserkers rage";
         }
         public override int CalculateDamage(Card OpponentsCard)
         {
