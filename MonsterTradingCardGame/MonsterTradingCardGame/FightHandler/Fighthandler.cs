@@ -92,12 +92,14 @@ namespace MCTG.FightHandle
                 Battlelog += $"Winner is the Attacker, the defeated Defender joins our Ranks {Environment.NewLine}";
                 Defender.RemoveAt(DefenderIndex);
                 Attacker.Add(CardOfDefender);
+                Battlelog += $"Deck Size: attacker: {Attacker.Count} defender: {Defender.Count}{Environment.NewLine}";
                 return;
             }
             {
                 Battlelog += $"Winner is the Defender, the defeated Attacker joins our Army {Environment.NewLine}";
                 Attacker.RemoveAt(AttackerIndex);
                 Defender.Add(CardOfAttacker);
+                Battlelog += $"Deck Size: attacker: {Attacker.Count} defender: {Defender.Count}{Environment.NewLine}";
                 return;
             }
         }

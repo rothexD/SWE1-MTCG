@@ -24,8 +24,7 @@ namespace NunitTests
             Card NormalSpell = new WaterSpell(10, "spell", 7, Card.CardelEmentEnum.normal);
             Dictionary<int, Card> Deck = new Dictionary<int, Card>();
             Dictionary<int, Card> Stack = new Dictionary<int, Card>();
-
-            
+        
             Deck.Add(Ork.CardId, Ork);
             Deck.Add(Wizzard.CardId, Wizzard);
             Deck.Add(WaterSpell.CardId, WaterSpell);
@@ -38,7 +37,7 @@ namespace NunitTests
             FightHandler Testfight = new FightHandler(User1, User2);
             Testfight.Fight();
             Console.Write(Testfight.Battlelog);
-            Assert.Fail();        
+            Assert.Pass();        
         }
     }
 }

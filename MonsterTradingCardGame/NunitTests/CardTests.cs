@@ -7,31 +7,60 @@ using MCTG.Cards.SpellCards;
 using NUnit.Framework;
 using System.Reflection;
 //https://stackoverflow.com/questions/33826500/how-to-run-a-nunit-test
-namespace MonsterTradingCardGame.tests
+namespace NunitTests
 {
     public class TestCards{
+        public Card Ork;
+        public Card Wizzard;
+        public Card WaterSpell;
+        public Card Goblin;
+        public Card Dragon;
+        public Card knight;
+        public Card NormalSpell;
+        public Card FireElve;
+        public Card FireSpell;
+        public Card Kraken;
+        [OneTimeSetUp]
+        public void Construct()
+        {
+            Ork = new Ork(10, "hans", 1, Card.CardelEmentEnum.normal);
+            Wizzard = new Wizzard(10, "Test", 2, Card.CardelEmentEnum.fire);
+            WaterSpell = new WaterSpell(10, "spell", 3, Card.CardelEmentEnum.water);
+            Goblin = new Goblin(10, "hans", 4, Card.CardelEmentEnum.normal);
+            Dragon = new Dragon(10, "Test", 5, Card.CardelEmentEnum.fire);
+            knight = new Knight(10, "Test", 6, Card.CardelEmentEnum.fire);
+            NormalSpell = new WaterSpell(10, "spell", 7, Card.CardelEmentEnum.normal);
+            FireElve = new FireElve(10, "hans", 5, Card.CardelEmentEnum.normal);
+            FireSpell = new WaterSpell(10, "spell", 2, Card.CardelEmentEnum.fire);
+            Kraken = new Kraken(10, "spell", 2, Card.CardelEmentEnum.fire);
+        }
         [Test]
-        public void OrkTest()
+        public void TestOrkVsWizzard_0()
         {
             Card Ork = new Ork(10, "hans", 5, Card.CardelEmentEnum.normal);
             Card Wizzard = new Wizzard(10, "Test", 5, Card.CardelEmentEnum.fire);
-            Card WaterSpell = new WaterSpell(10, "spell", 2, Card.CardelEmentEnum.water);
+            int DamageVsWizzard;
 
-            int DamageVsWizzard = Ork.CalculateDamage(Wizzard);
-            int DamageVsWaterSpell = Ork.CalculateDamage(WaterSpell);
+            DamageVsWizzard = Ork.CalculateDamage(Wizzard);
 
             Assert.AreEqual(0, DamageVsWizzard);
-            Assert.AreEqual(20, DamageVsWaterSpell);
+        }
+        public void TestOrkVsNonWizzard_10()
+        {
+            int DamageVsNonWizzard;
+
+            DamageVsNonWizzard = Ork.CalculateDamage(Goblin);
+
+            Assert.AreEqual(10, DamageVsNonWizzard);
         }
         [Test]
-        public void TestDragon()
+        public void TestDragonVsFireElve_0()
         {
-            Card FireElve = new FireElve(10, "hans", 5, Card.CardelEmentEnum.normal);
-            Card Dragon = new Dragon(10, "Test", 5, Card.CardelEmentEnum.fire);
+            int DamageVsFireElve;
 
-            int DamageVsWizzard = Dragon.CalculateDamage(FireElve);
+            DamageVsFireElve = Dragon.CalculateDamage(FireElve);
 
-            Assert.AreEqual(0, DamageVsWizzard);
+            Assert.AreEqual(0, DamageVsFireElve);
         }
         [Test]
         public void TestFireElve()
@@ -39,43 +68,48 @@ namespace MonsterTradingCardGame.tests
             Assert.Pass();
         }
         [Test]
-        public void TestGoblin()
+        public void TestGoblinVsDragon_0()
         {
-            Card Goblin = new Goblin(10, "hans", 5, Card.CardelEmentEnum.normal);
-            Card Dragon = new Dragon(10, "Test", 5, Card.CardelEmentEnum.fire);
+            int DamageVsDragon;
 
-            int DamageVsDragon = Goblin.CalculateDamage(Dragon);
+            DamageVsDragon = Goblin.CalculateDamage(Dragon);
 
             Assert.AreEqual(0, DamageVsDragon);
         }
         [Test]
-        public void TestKnight()
+        public void TestKnightVSWater_0()
         {
-            Card knight = new Knight(10, "Test", 5, Card.CardelEmentEnum.fire);
-            Card WaterSpell = new WaterSpell(10, "spell", 2, Card.CardelEmentEnum.water);
-            Card NormalSpell = new NormalSpell(10, "spell", 2, Card.CardelEmentEnum.normal);
+            int DamageVsWater;
 
-            int DamageVsWater = knight.CalculateDamage(WaterSpell);
-            int DamageVsNormal = knight.CalculateDamage(NormalSpell);
+            DamageVsWater = knight.CalculateDamage(WaterSpell);
 
             Assert.AreEqual(0, DamageVsWater);
-            Assert.AreEqual(20, DamageVsNormal);
         }
         [Test]
-        public void TestKraken()
+        public void TestKrakenVsFire_0()
         {
-            Card WaterSpell = new WaterSpell(10, "spell", 2, Card.CardelEmentEnum.water);
-            Card NormalSpell = new WaterSpell(10, "spell", 2, Card.CardelEmentEnum.normal);
-            Card FireSpell = new WaterSpell(10, "spell", 2, Card.CardelEmentEnum.fire);
-            Card Kraken = new Kraken(10, "spell", 2, Card.CardelEmentEnum.fire);
+            int KrakenVsFire;
 
-
-            int KrakenVsFire = FireSpell.CalculateDamage(Kraken);
-            int KrakenVsWater = WaterSpell.CalculateDamage(Kraken);
-            int KrakenVsNormal = NormalSpell.CalculateDamage(Kraken);
+            KrakenVsFire = FireSpell.CalculateDamage(Kraken);
 
             Assert.AreEqual(0, KrakenVsFire);
+        }
+        [Test]
+        public void TestKrakenVSWater_0()
+        {
+            int KrakenVsWater;
+
+            KrakenVsWater = WaterSpell.CalculateDamage(Kraken);
+
             Assert.AreEqual(0, KrakenVsWater);
+        }
+        [Test]
+        public void TestKrakenVsNormal()
+        {
+            int KrakenVsNormal;
+
+            KrakenVsNormal = NormalSpell.CalculateDamage(Kraken);
+
             Assert.AreEqual(0, KrakenVsNormal);
         }
         [Test]
@@ -83,31 +117,87 @@ namespace MonsterTradingCardGame.tests
         {
             Assert.Pass();
         }
+        //elemental
         [Test]
-        public void TestElementalDamageCalculation()
+        public void TestElementalDamageCalculation_FireVsFire_10()
         {
-            Card WaterSpell = new WaterSpell(10, "spell", 2, Card.CardelEmentEnum.water);
-            Card NormalSpell = new WaterSpell(10, "spell", 2, Card.CardelEmentEnum.normal);
-            Card FireSpell = new WaterSpell(10, "spell", 2, Card.CardelEmentEnum.fire);
-            
-            int FireVsFire = FireSpell.CalculateDamage(FireSpell);
-            int FireVsWater = FireSpell.CalculateDamage(WaterSpell);
-            int FireVsNormal = FireSpell.CalculateDamage(NormalSpell);
+            int FireVsFire;
 
-            int WaterVsFire = WaterSpell.CalculateDamage(FireSpell);
-            int WaterVsNormal = WaterSpell.CalculateDamage(NormalSpell);
-
-            int NormalVsFire = NormalSpell.CalculateDamage(FireSpell);
-            int NormalVsWater = NormalSpell.CalculateDamage(WaterSpell);
-
+            FireVsFire = FireSpell.CalculateDamage(FireSpell);
 
             Assert.AreEqual(10, FireVsFire);
+        }
+        [Test]
+        public void TestElementalDamageCalculation_FireVsWater_5()
+        {
+            int FireVsWater;
+
+            FireVsWater = FireSpell.CalculateDamage(WaterSpell);
+
             Assert.AreEqual(5, FireVsWater);
+        }
+        [Test]
+        public void TestElementalDamageCalculation_FireVsNormal_20()
+        {
+            int FireVsNormal;
+
+            FireVsNormal = FireSpell.CalculateDamage(NormalSpell);
+
             Assert.AreEqual(20, FireVsNormal);
-            Assert.AreEqual(20, WaterVsFire);
+        }
+        [Test]
+        public void TestElementalDamageCalculation_WaterVsWater_10()
+        {
+            int WaterVsWater;
+
+            WaterVsWater = WaterSpell.CalculateDamage(WaterSpell);
+
+            Assert.AreEqual(10, WaterVsWater);
+        }
+        [Test]
+        public void TestElementalDamageCalculation_WaterVsNormal_5()
+        {
+            int WaterVsNormal;
+
+            WaterVsNormal = WaterSpell.CalculateDamage(NormalSpell);
+
             Assert.AreEqual(5, WaterVsNormal);
-            Assert.AreEqual(5, NormalVsFire);
+        }
+        [Test]
+        public void TestElementalDamageCalculation_WaterVsFire_20()
+        {
+            int WaterVsFire;
+
+            WaterVsFire = WaterSpell.CalculateDamage(FireSpell);
+
+            Assert.AreEqual(20, WaterVsFire);
+        }
+        public void TestElementalDamageCalculation_NormalVsNormal_10()
+        {
+            int NormalVsNormal;
+
+            NormalVsNormal = NormalSpell.CalculateDamage(NormalSpell);
+
+            Assert.AreEqual(10, NormalVsNormal);
+        }
+        [Test]
+        public void TestElementalDamageCalculation_NormalVsWater_20()
+        {
+            int NormalVsWater;
+
+            NormalVsWater = NormalSpell.CalculateDamage(WaterSpell);
+
             Assert.AreEqual(20, NormalVsWater);
+        }
+        [Test]
+        public void TestElementalDamageCalculation_NormalVsFire_5()
+        {
+            int NormalVsFIre;
+
+            NormalVsFIre = NormalSpell.CalculateDamage(FireSpell);
+
+            Assert.AreEqual(5, NormalVsFIre);
         }
     }
 }
+

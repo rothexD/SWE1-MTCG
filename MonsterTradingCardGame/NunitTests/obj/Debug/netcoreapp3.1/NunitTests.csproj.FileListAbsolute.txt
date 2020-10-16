@@ -192,3 +192,5 @@ C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\MonsterTradingCardGame\NunitTests\ob
 C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\MonsterTradingCardGame\NunitTests\obj\Debug\netcoreapp3.1\NunitTests.csproj.CopyComplete
 C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\MonsterTradingCardGame\NunitTests\obj\Debug\netcoreapp3.1\NunitTests.dll
 C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\MonsterTradingCardGame\NunitTests\obj\Debug\netcoreapp3.1\NunitTests.pdb
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\MonsterTradingCardGame\NunitTests\bin\Debug\netcoreapp3.1\Castle.Core.dll
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\MonsterTradingCardGame\NunitTests\bin\Debug\netcoreapp3.1\Moq.dll
