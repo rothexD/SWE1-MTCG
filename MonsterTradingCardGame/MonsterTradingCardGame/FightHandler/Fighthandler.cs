@@ -19,16 +19,20 @@ namespace MCTG.FightHandle
         private List<Card> Player2TempDeck;
         private Player Player1;
         private Player Player2;
-        private const int MaxRounds = 100;
+        public const int MaxRounds = 100;
         private Random Dice;
         public BattleStatus Status { get; private set; }
      
-
+        
         public FightHandler(Player Player1,Player Player2)
         {
-            if (Player1.Deck.Count != 5 || Player2.Deck.Count != 5)
+            if (Player1.Deck.Count != 5)
             {
-                throw new ArgumentException("One Player less than 5 cards in Deck");
+                throw new ArgumentException("Player1 less than 5 cards in Deck");
+            }
+            if (Player2.Deck.Count != 5)
+            {
+                throw new ArgumentException("Player2 less than 5 cards in Deck");
             }
             Player1TempDeck = new List<Card>();
             Player2TempDeck = new List<Card>();
@@ -45,6 +49,30 @@ namespace MCTG.FightHandle
             {
                 Player2TempDeck.Add(item.Value);
             }
+        }
+        public void TestShuffleRiggedDice(Random RiggedDice)
+        {
+            Random OldDice = Dice;
+            Dice = RiggedDice;
+            ShuffleTempLists();
+            Dice = OldDice;
+            return;
+        }
+        public void TestFightOneRoundRiggedDice( Random RiggedDice,ref List<Card> Player1, ref List<Card> Player2)
+        {
+            Random OldDice = Dice;
+            Dice = RiggedDice;
+            FightOneRound(ref Player1,ref Player2);
+            Dice = OldDice;
+            return;
+        }
+        public List<Card> ReturnTempDeck1()
+        {
+            return Player1TempDeck;
+        }
+        public List<Card> ReturnTempDeck2()
+        {
+            return Player2TempDeck;
         }
         private void BattlelogHeader(bool FirstPlayer)
         {
