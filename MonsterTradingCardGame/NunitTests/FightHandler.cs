@@ -6,11 +6,12 @@ using MCTG.Cards.SpellCards;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using MCTG.FightHandle;
+using MCTG.FightHandlers;
 using Moq;
+
 namespace NunitTests
 {
-    class TestFightHandler
+    class TestFightManager
     {
         public Card Ork;
         public Card Wizzard;
@@ -86,7 +87,7 @@ namespace NunitTests
             }
         }
         [Test]
-        public void TestFight()
+        public void TestFightCombatLog()
         {
             Player User1;
             Player User2;
@@ -100,9 +101,90 @@ namespace NunitTests
             Assert.Pass();        
         }
         [Test]
+        public void FullFightWinnerPlayer1()
+        {
+            Player User1;
+            Player User2;
+            TestFightHandler TestFight;
+            int EloUser1;
+            int EloUser2;
+
+
+            User1 = new Player("Lukas", 0, 0, 0, 20, 100, Stack, DeckUser1Full);
+            User2 = new Player("Lam", 0, 0, 0, 20, 100, Stack, DeckUser2Full);
+
+            TestFight = new TestFightHandler(User1, User2);
+            FightHandler.BattleStatus StatusOfFight = TestFight.FullFightWinnerPlayer1_RiggedDice();
+            EloUser1 = User1.Elo;
+            EloUser2 = User2.Elo;
+
+            Assert.AreEqual(FightHandler.BattleStatus.Player1Winner, StatusOfFight);
+            Assert.AreEqual(105, EloUser1);
+            Assert.AreEqual(97, EloUser2);
+        }
+        [Test]
+        public void FullFightWinnerPlayer2()
+        {
+            Player User1;
+            Player User2;
+            TestFightHandler TestFight;
+            int EloUser1;
+            int EloUser2;
+
+
+            User1 = new Player("Lukas", 0, 0, 0, 20, 100, Stack, DeckUser1Full);
+            User2 = new Player("Lam", 0, 0, 0, 20, 100, Stack, DeckUser2Full);
+
+            TestFight = new TestFightHandler(User1, User2);
+            FightHandler.BattleStatus StatusOfFight = TestFight.FullFightWinnerPlayer2_RiggedDice();
+            EloUser1 = User1.Elo;
+            EloUser2 = User2.Elo;
+
+            Assert.AreEqual(FightHandler.BattleStatus.Player2Winner, StatusOfFight);
+            Assert.AreEqual(105, EloUser2);
+            Assert.AreEqual(97, EloUser1);
+        }
+        /*
+        [Test]
+        public void FindTie()
+        {
+            Player User1;
+            Player User2;
+            TestFightHandler TestFight;
+
+            User1 = new Player("Lukas", 0, 0, 0, 20, 100, Stack, DeckUser1Full);
+            User2 = new Player("Lam", 0, 0, 0, 20, 100, Stack, DeckUser2Full);
+
+            TestFight = new TestFightHandler(User1, User2);
+            int TieDiceValue = TestFight.FindTie();
+            Assert.AreEqual(-1, TieDiceValue);
+        }
+        [Test]
+        public void FullFightTie()
+        {
+            Player User1;
+            Player User2;
+            TestFightHandler TestFight;
+            int EloUser1;
+            int EloUser2;
+
+
+            User1 = new Player("Lukas", 0, 0, 0, 20, 100, Stack, DeckUser1Full);
+            User2 = new Player("Lam", 0, 0, 0, 20, 100, Stack, DeckUser2Full);
+
+            TestFight = new TestFightHandler(User1, User2);
+            FightHandler.BattleStatus StatusOfFight = TestFight.FullFightWinnerPlayer2_RiggedDice();
+            EloUser1 = User1.Elo;
+            EloUser2 = User2.Elo;
+
+            Assert.AreEqual(FightHandler.BattleStatus.Tie, StatusOfFight);
+            Assert.AreEqual(99, EloUser2);
+            Assert.AreEqual(99, EloUser1);
+        }*/
+        [Test]
         public void TestShuffleDeck()
         {
-            FightHandler TestFight;
+            TestFightHandler TestFight;
             Player User;
             Player User2;
             Random RiggedDice;
@@ -111,12 +193,12 @@ namespace NunitTests
             RefreshExampleCombatLists();
             User = new Player("Lukas", 0, 0, 0, 20, 100,Stack, DeckUser1Full);
             User2 = new Player("Lam", 0, 0, 0, 20, 100, Stack, DeckUser2Full);
-            TestFight = new FightHandler(User, User2);
+            TestFight = new TestFightHandler(User, User2);
             TestFight.TestShuffleRiggedDice(RiggedDice);
             ExampleShuffle();
 
-            CollectionAssert.AreEqual(ExampleCombatListPlayer1, TestFight.ReturnTempDeck1());
-            CollectionAssert.AreEqual(ExampleCombatListPlayer2, TestFight.ReturnTempDeck2());
+            CollectionAssert.AreEqual(ExampleCombatListPlayer1, TestFight.ReturnTempDeck1_List());
+            CollectionAssert.AreEqual(ExampleCombatListPlayer2, TestFight.ReturnTempDeck2_List());
          
         } 
         private void ExampleShuffle()
@@ -148,7 +230,7 @@ namespace NunitTests
         [Test]
         public void TestFightOneRoundAttackerWin()
         {
-            FightHandler TestFight;
+            TestFightHandler TestFight;
             Player User;
             Player User2;
             Random RiggedDice;
@@ -170,7 +252,7 @@ namespace NunitTests
             RefreshExampleCombatLists();
             User = new Player("Lukas", 0, 0, 0, 20, 100, Stack, DeckUser1Full);
             User2 = new Player("Lam", 0, 0, 0, 20, 100, Stack, DeckUser2Full);
-            TestFight = new FightHandler(User, User2);
+            TestFight = new TestFightHandler(User, User2);
 
             TestFight.TestFightOneRoundRiggedDice(RiggedDice,ref AfterPlayer1, ref AfterPlayer2);
 
@@ -184,7 +266,7 @@ namespace NunitTests
         [Test]
         public void TestFightOneRoundDefenderWin()
         {
-            FightHandler TestFight;
+            TestFightHandler TestFight;
             Player User;
             Player User2;
             Random RiggedDice;
@@ -206,7 +288,7 @@ namespace NunitTests
             RefreshExampleCombatLists();
             User = new Player("Lukas", 0, 0, 0, 20, 100, Stack, DeckUser1Full);
             User2 = new Player("Lam", 0, 0, 0, 20, 100, Stack, DeckUser2Full);
-            TestFight = new FightHandler(User, User2);
+            TestFight = new TestFightHandler(User, User2);
 
             TestFight.TestFightOneRoundRiggedDice(RiggedDice, ref AfterPlayer1, ref AfterPlayer2);
 
@@ -217,9 +299,9 @@ namespace NunitTests
             CollectionAssert.AreEqual(BeforePlayer2, AfterPlayer2);
         }
         [Test]
-        public void TiedDefenderWin()
+        public void TestFightOneRoundTiedDefenderWin()
         {
-            FightHandler TestFight;
+            TestFightHandler TestFight;
             Player User;
             Player User2;
             Random RiggedDice;
@@ -241,7 +323,7 @@ namespace NunitTests
             RefreshExampleCombatLists();
             User = new Player("Lukas", 0, 0, 0, 20, 100, Stack, DeckUser1Full);
             User2 = new Player("Lam", 0, 0, 0, 20, 100, Stack, DeckUser2Full);
-            TestFight = new FightHandler(User, User2);
+            TestFight = new TestFightHandler(User, User2);
 
             TestFight.TestFightOneRoundRiggedDice(RiggedDice, ref AfterPlayer1, ref AfterPlayer2);
 

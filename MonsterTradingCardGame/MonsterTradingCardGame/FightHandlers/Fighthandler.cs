@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using MCTG.Cards;
 using MCTG.Players;
-namespace MCTG.FightHandle
+namespace MCTG.FightHandlers
 {
     public class FightHandler
     {
@@ -14,14 +14,14 @@ namespace MCTG.FightHandle
             Player1Winner,
             Player2Winner
         }
-        public string Battlelog { get; private set;  }
-        private List<Card> Player1TempDeck;
-        private List<Card> Player2TempDeck;
-        private Player Player1;
-        private Player Player2;
+        public string Battlelog { get; protected set;  }
+        protected List<Card> Player1TempDeck;
+        protected List<Card> Player2TempDeck;
+        protected Player Player1;
+        protected Player Player2;
         public const int MaxRounds = 100;
-        private Random Dice;
-        public BattleStatus Status { get; private set; }
+        protected Random Dice;
+        public BattleStatus Status { get; protected set; }
      
         
         public FightHandler(Player Player1,Player Player2)
@@ -50,31 +50,8 @@ namespace MCTG.FightHandle
                 Player2TempDeck.Add(item.Value);
             }
         }
-        public void TestShuffleRiggedDice(Random RiggedDice)
-        {
-            Random OldDice = Dice;
-            Dice = RiggedDice;
-            ShuffleTempLists();
-            Dice = OldDice;
-            return;
-        }
-        public void TestFightOneRoundRiggedDice( Random RiggedDice,ref List<Card> Player1, ref List<Card> Player2)
-        {
-            Random OldDice = Dice;
-            Dice = RiggedDice;
-            FightOneRound(ref Player1,ref Player2);
-            Dice = OldDice;
-            return;
-        }
-        public List<Card> ReturnTempDeck1()
-        {
-            return Player1TempDeck;
-        }
-        public List<Card> ReturnTempDeck2()
-        {
-            return Player2TempDeck;
-        }
-        private void BattlelogHeader(bool FirstPlayer)
+
+        protected void BattlelogHeader(bool FirstPlayer)
         {
             Player TempFirstPlayer;
             if (!FirstPlayer)
@@ -101,7 +78,7 @@ namespace MCTG.FightHandle
             }
             Battlelog += $"--------------------------------------------------------------------------------------------{Environment.NewLine}";
         }
-        private void FightOneRound(ref List<Card> Attacker, ref List<Card> Defender)
+        protected void FightOneRound(ref List<Card> Attacker, ref List<Card> Defender)
         {
             if (Attacker.Count == 0|| Defender.Count ==0)
             {
@@ -131,7 +108,7 @@ namespace MCTG.FightHandle
                 return;
             }
         }
-        private void ShuffleTempLists()
+        protected void ShuffleTempLists()
         {
         //https://stackoverflow.com/questions/273313/randomize-a-listt
             for (int i = 0; i < Dice.Next(0, 100); i++)

@@ -30,11 +30,8 @@ namespace NunitTests
             NormalSpell = new WaterSpell(10, "spell", 7, Card.CardelEmentEnum.normal);
         }
         [Test]
-        public void testConstructor()
+        public void testConstructorToManyInDeck_exception()
         {
-            bool FirstTryCatch = false;
-            bool SecondTryCatch = false;
-           
             Dictionary<int, Card> Deck = new Dictionary<int, Card>();
             Dictionary<int, Card> Stack = new Dictionary<int, Card>();
 
@@ -45,34 +42,25 @@ namespace NunitTests
             Deck.Add(Goblin.CardId, Goblin);
             Deck.Add(Dragon.CardId, Dragon);
             Deck.Add(knight.CardId, knight);
+            
+            Assert.Throws(typeof(ArgumentException) , delegate { new Player("Lukas", 0, 0, 0, 20, 100, Stack, Deck); });
+            Assert.Throws(typeof(ArgumentException), delegate { new Player("Lukas", 0, 0, 0, 20, 100, Stack, Deck); });
+        }
+        public void testConstructorDuplicateDeckStack_exception()
+        {
+            Dictionary<int, Card> Deck = new Dictionary<int, Card>();
+            Dictionary<int, Card> Stack = new Dictionary<int, Card>();
 
-            try
-            {
-                Player User = new Player("Lukas", 0, 0, 0, 20, 100, Stack, Deck);
-            }
-            catch (ArgumentException e)
-            {
-                FirstTryCatch = true;
-                Assert.Pass(e.Message);
-            }
+            //----------------------------------------------------------------------------------
+            Deck.Add(Ork.CardId, Ork);
+            Deck.Add(Wizzard.CardId, Wizzard);
+            Deck.Add(WaterSpell.CardId, WaterSpell);
+            Deck.Add(Goblin.CardId, Goblin);
+            Deck.Add(Dragon.CardId, Dragon);
+
             Stack.Add(Ork.CardId, Ork);
-            try
-            {
-                Player User = new Player("Lukas", 0, 0, 0, 20, 100, Stack, Deck);
-            }
-            catch (ArgumentException e)
-            {
-                SecondTryCatch = true;
-                Assert.Pass(e.Message);
-            }
-            if (FirstTryCatch && SecondTryCatch)
-            {
-                Assert.Pass();
-            }
-            else
-            {
-                Assert.Fail();
-            }
+
+            Assert.Throws(typeof(ArgumentException), delegate { new Player("Lukas", 0, 0, 0, 20, 100, Stack, Deck); });
         }
         [Test]
         public void TestAddToStack_Success()

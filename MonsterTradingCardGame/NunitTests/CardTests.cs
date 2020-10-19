@@ -29,29 +29,37 @@ namespace NunitTests
             Goblin = new Goblin(10, "hans", 4, Card.CardelEmentEnum.normal);
             Dragon = new Dragon(10, "Test", 5, Card.CardelEmentEnum.fire);
             knight = new Knight(10, "Test", 6, Card.CardelEmentEnum.fire);
-            NormalSpell = new WaterSpell(10, "spell", 7, Card.CardelEmentEnum.normal);
+            NormalSpell = new NormalSpell(10, "spell", 7, Card.CardelEmentEnum.normal);
             FireElve = new FireElve(10, "hans", 5, Card.CardelEmentEnum.normal);
-            FireSpell = new WaterSpell(10, "spell", 2, Card.CardelEmentEnum.fire);
+            FireSpell = new FireSpell(10, "spell", 2, Card.CardelEmentEnum.fire);
             Kraken = new Kraken(10, "spell", 2, Card.CardelEmentEnum.fire);
         }
         [Test]
         public void TestOrkVsWizzard_0()
         {
-            Card Ork = new Ork(10, "hans", 5, Card.CardelEmentEnum.normal);
-            Card Wizzard = new Wizzard(10, "Test", 5, Card.CardelEmentEnum.fire);
             int DamageVsWizzard;
 
             DamageVsWizzard = Ork.CalculateDamage(Wizzard);
 
             Assert.AreEqual(0, DamageVsWizzard);
         }
-        public void TestOrkVsNonWizzard_10()
+        [Test]
+        public void TestOrkVsNonWizard_10()
         {
-            int DamageVsNonWizzard;
+            int DamageVskraken;
 
-            DamageVsNonWizzard = Ork.CalculateDamage(Goblin);
+            DamageVskraken = Ork.CalculateDamage(Kraken);
 
-            Assert.AreEqual(10, DamageVsNonWizzard);
+            Assert.AreEqual(10, DamageVskraken);
+        }
+        [Test]
+        public void TestOrkVsSpell_5()
+        {
+            int DamageVsFirespell;
+
+            DamageVsFirespell = Ork.CalculateDamage(FireSpell);
+
+            Assert.AreEqual(5, DamageVsFirespell);
         }
         [Test]
         public void TestDragonVsFireElve_0()
@@ -63,9 +71,36 @@ namespace NunitTests
             Assert.AreEqual(0, DamageVsFireElve);
         }
         [Test]
-        public void TestFireElve()
+        public void TestDragonVsNonFireElve_10()
         {
-            Assert.Pass();
+            int DamageVsNonFireElve;
+
+            DamageVsNonFireElve = Dragon.CalculateDamage(Ork);
+
+            Assert.AreEqual(10, DamageVsNonFireElve);
+        }
+        [Test]
+        public void TestDragonVsSpell_10()
+        {
+            int DamageVsSpell;
+
+            DamageVsSpell = Dragon.CalculateDamage(FireSpell);
+
+            Assert.AreEqual(10, DamageVsSpell);
+        }
+        [Test]
+        public void TestFireElveVsMonster_10()
+        {
+            int DamageVsMonster;
+            DamageVsMonster = FireElve.CalculateDamage(Ork);
+            Assert.AreEqual(10, DamageVsMonster);
+        }
+        [Test]
+        public void TestFireElveVsSpell_5()
+        {
+            int DamageVsSpell;
+            DamageVsSpell = FireElve.CalculateDamage(FireSpell);
+            Assert.AreEqual(5, DamageVsSpell);
         }
         [Test]
         public void TestGoblinVsDragon_0()
@@ -77,7 +112,25 @@ namespace NunitTests
             Assert.AreEqual(0, DamageVsDragon);
         }
         [Test]
-        public void TestKnightVSWater_0()
+        public void TestGoblinVsNonDragon_10()
+        {
+            int DamageVsNonDragon;
+
+            DamageVsNonDragon = Goblin.CalculateDamage(Ork);
+
+            Assert.AreEqual(10, DamageVsNonDragon);
+        }
+        [Test]
+        public void TestGoblinVsSpell_20()
+        {
+            int DamageVsDragon;
+
+            DamageVsDragon = Goblin.CalculateDamage(WaterSpell);
+
+            Assert.AreEqual(20, DamageVsDragon);
+        }
+        [Test]
+        public void TestKnightVSWaterSpell_0()
         {
             int DamageVsWater;
 
@@ -86,37 +139,56 @@ namespace NunitTests
             Assert.AreEqual(0, DamageVsWater);
         }
         [Test]
-        public void TestKrakenVsFire_0()
+        public void TestKnightVSNonWaterSpell_10()
         {
-            int KrakenVsFire;
+            int DamageVsNonWater;
 
-            KrakenVsFire = FireSpell.CalculateDamage(Kraken);
+            DamageVsNonWater = knight.CalculateDamage(FireSpell);
 
-            Assert.AreEqual(0, KrakenVsFire);
+            Assert.AreEqual(10, DamageVsNonWater);
         }
         [Test]
-        public void TestKrakenVSWater_0()
+        public void TestKnightVSMonster_10()
         {
-            int KrakenVsWater;
+            int DamageVsMonster;
 
-            KrakenVsWater = WaterSpell.CalculateDamage(Kraken);
+            DamageVsMonster = knight.CalculateDamage(Ork);
 
-            Assert.AreEqual(0, KrakenVsWater);
+            Assert.AreEqual(10, DamageVsMonster);
+        }
+
+        [Test]
+        public void TestKrakenVsSpell_10()
+        {
+            int DamageVsSpell;
+            DamageVsSpell = Kraken.CalculateDamage(FireSpell);
+            Assert.AreEqual(10, DamageVsSpell);
         }
         [Test]
-        public void TestKrakenVsNormal()
+        public void TestKrakenVsMonster_10()
         {
-            int KrakenVsNormal;
+            int DamageVsMonster;
 
-            KrakenVsNormal = NormalSpell.CalculateDamage(Kraken);
+            DamageVsMonster = Kraken.CalculateDamage(Ork);
 
-            Assert.AreEqual(0, KrakenVsNormal);
+            Assert.AreEqual(10, DamageVsMonster);
         }
         [Test]
-        public void TestWizzard()
+        public void TestWizzardVsMonster_10()
         {
-            Assert.Pass();
+            int DamageVsMonster;
+            DamageVsMonster = Wizzard.CalculateDamage(Ork);
+            Assert.AreEqual(10, DamageVsMonster);
         }
+        [Test]
+        public void TestWizzardVsSpell_10()
+        {
+            int DamageVsSpell;
+            DamageVsSpell = Wizzard.CalculateDamage(FireSpell);
+            Assert.AreEqual(10, DamageVsSpell);
+        }
+
+
         //elemental
         [Test]
         public void TestElementalDamageCalculation_FireVsFire_10()
@@ -197,6 +269,36 @@ namespace NunitTests
             NormalVsFIre = NormalSpell.CalculateDamage(FireSpell);
 
             Assert.AreEqual(5, NormalVsFIre);
+        }
+
+
+        //Spells
+        [Test]
+        public void TestFireSpellVsKraken_0()
+        {
+            int FireVSKraken;
+
+            FireVSKraken = FireSpell.CalculateDamage(Kraken);
+
+            Assert.AreEqual(0, FireVSKraken);
+        }
+        [Test]
+        public void TestWaterSpellVSKraken_0()
+        {
+            int WaterVsKraken;
+
+            WaterVsKraken = WaterSpell.CalculateDamage(Kraken);
+
+            Assert.AreEqual(0, WaterVsKraken);
+        }
+        [Test]
+        public void TestNormalSpellVsKraken()
+        {
+            int NormalVsKraken;
+
+            NormalVsKraken = NormalSpell.CalculateDamage(Kraken);
+
+            Assert.AreEqual(0, NormalVsKraken);
         }
     }
 }
