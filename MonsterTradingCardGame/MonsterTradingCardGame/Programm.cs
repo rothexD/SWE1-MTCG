@@ -15,12 +15,7 @@ namespace MCTG
                 Console.WriteLine(Dice.Next(0, 5));
             }          
             Console.ReadLine();
-
-
-
-
-            return;
-            
+            return;         
         }
     }
 }
