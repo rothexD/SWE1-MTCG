@@ -102,12 +102,12 @@ namespace WebserviceRest
         public bool Parse()
         {
             ResetContext();
-            Byte[] bytes = new Byte[4096];
+            Byte[] bytes = new Byte[4000];
             String data = null;
             string[] SplitByEndline = null;
             string[] SplitBuffer = null;
             bool RecievingHTTPMessage = false;
-
+            string Buffer ="";
             int i = 0;
             int counter = 0;
             while ((i = Stream.Read(bytes, 0, bytes.Length)) != 0)
@@ -115,6 +115,8 @@ namespace WebserviceRest
                 if (!RecievingHTTPMessage)
                 {
                     data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                    data = Buffer + data;
+                    Buffer = "";
                     SplitByEndline = data.Split('\n');
                     if (counter == 0)
                     {
@@ -129,21 +131,27 @@ namespace WebserviceRest
                         SplitByEndline[0] = "\n\n\n\0";
                         counter++;
                     }
-                    foreach (string SubString in SplitByEndline)
+                    foreach (string SubStringNotTrimmed in SplitByEndline)
                     {
+                        string SubString = SubStringNotTrimmed.Trim('\r');
                         if (SubString == "\n\n\n\0")
                         {
+                            continue;
+                        }                     
+                        if (SubString.Length == 0) 
+                        {
+                            RecievingHTTPMessage = true;
                             continue;
                         }
                         if (!RecievingHTTPMessage)
                         {
-                            //https://stackoverflow.com/questions/21519548/split-string-based-on-the-first-occurrence-of-the-character
                             SplitBuffer = SubString.Split(new[] { ':' }, 2);
-                            if(SplitBuffer.Length == 1)
+                            if (SplitBuffer.Length == 1)
                             {
-                                RecievingHTTPMessage = true;
+                                Buffer = SubString;
                                 continue;
                             }
+                            //https://stackoverflow.com/questions/21519548/split-string-based-on-the-first-occurrence-of-the-character
                             Headers.Add(SplitBuffer[0], SplitBuffer[1].Trim(' '));
                         }
                         else
@@ -424,7 +432,7 @@ namespace WebserviceRest
 
             if (HTTPrequest != null)
             {
-                /*
+                
                 Console.WriteLine("HTTP-Verb: " + HTTPrequest.HTTPVerb);
                 Console.WriteLine("HttpProtokoll: " + HTTPrequest.HttpProtokoll);
                 Console.WriteLine("MessageEndPoint: " + HTTPrequest.MessageEndPoint);
@@ -433,7 +441,11 @@ namespace WebserviceRest
                 {
                     Console.WriteLine("PayLoad " + HTTPrequest.PayLoad.Length + ":\n" + HTTPrequest.PayLoad + "");
                 }
-                */
+                else
+                {
+                    Console.Write("no payload\n");
+                }
+                
             }
             else
             {

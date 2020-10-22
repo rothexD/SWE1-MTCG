@@ -8,3 +8,4 @@ C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\Restservice\obj\Debug\netcoreapp3.1\
 C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\Restservice\obj\Debug\netcoreapp3.1\Restservice.AssemblyInfo.cs
 C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\Restservice\obj\Debug\netcoreapp3.1\Restservice.dll
 C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\Restservice\obj\Debug\netcoreapp3.1\Restservice.pdb
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\Restservice\obj\Debug\netcoreapp3.1\Restservice.csprojAssemblyReference.cache
