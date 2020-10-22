@@ -68,10 +68,8 @@ namespace NunitTests
             Player User = new Player("Lukas", 0, 0, 0, 20, 100);
 
             int Stacksize = User.Stack.Count;
-            DeckAndStackStatus Success = User.AddToStack(Ork);
-            DeckAndStackStatus UserAlreadyHasCardInStackOrDeck = User.AddToStack(Ork);
 
-            Assert.AreEqual(DeckAndStackStatus.Success, Success);
+            Assert.IsTrue(User.AddToStack(Ork));
             Assert.AreEqual(Stacksize+1, User.Stack.Count);
         }
         [Test]
@@ -82,22 +80,20 @@ namespace NunitTests
 
             User.AddToStack(Ork);
             Stacksize = User.Stack.Count;
-            DeckAndStackStatus UserAlreadyHasCardInStackOrDeck = User.AddToStack(Ork);
 
-            Assert.AreEqual(DeckAndStackStatus.UserAlreadyOwnsCard, UserAlreadyHasCardInStackOrDeck);
+            Assert.IsFalse(User.AddToStack(Ork));
             Assert.AreEqual(Stacksize, User.Stack.Count);
         }
         [Test]
         public void TestRemoveFromStack_Success()
         {
             Player User = new Player("Lukas", 0, 0, 0, 20, 100);
+
             User.AddToStack(Ork);
             int Stacksize = User.Stack.Count;
 
-            DeckAndStackStatus Success = User.RemoveFromStack(Ork.CardId);
 
-
-            Assert.AreEqual(DeckAndStackStatus.Success, Success);
+            Assert.IsTrue(User.RemoveFromStack(Ork.CardId));
             Assert.AreEqual(Stacksize-1, User.Stack.Count);
         }
         [Test]
@@ -106,11 +102,9 @@ namespace NunitTests
             Player User = new Player("Lukas", 0, 0, 0, 20, 100);
             int Stacksize;
 
-
             Stacksize = User.Stack.Count;
-            DeckAndStackStatus FailureCardNotInStack = User.RemoveFromStack(Ork.CardId);
 
-            Assert.AreEqual(DeckAndStackStatus.CardNotInStack, FailureCardNotInStack);
+            Assert.IsFalse(User.RemoveFromStack(Ork.CardId));
             Assert.AreEqual(Stacksize, User.Stack.Count);
         }
         [Test]
@@ -128,10 +122,9 @@ namespace NunitTests
             User = new Player("Lukas", 0, 0, 0, 20, 100, Stack, Deck);
             DeckSize = User.Deck.Count;
             StackSize = User.Stack.Count;
-            DeckAndStackStatus Success = User.MoveFromDeckToStack(Ork.CardId);
             //--------------------------------------------------------------------
 
-            Assert.AreEqual(DeckAndStackStatus.Success, Success);
+            Assert.IsTrue(User.MoveFromDeckToStack(Ork.CardId));
             Assert.AreEqual(DeckSize-1, User.Deck.Count);
             Assert.AreEqual(StackSize+1, User.Stack.Count);
         }
@@ -150,9 +143,8 @@ namespace NunitTests
             User = new Player("Lukas", 0, 0, 0, 20, 100, Stack, Deck);
             DeckSize = User.Deck.Count;
             StackSize = User.Stack.Count;
-            DeckAndStackStatus FailureCardNotInDeck = User.MoveFromDeckToStack(-1);
             //--------------------------------------------------------------------
-            Assert.AreEqual(DeckAndStackStatus.CardNotInDeck, FailureCardNotInDeck);
+            Assert.IsFalse(User.MoveFromDeckToStack(-1));
             Assert.AreEqual(DeckSize, User.Deck.Count);
             Assert.AreEqual(StackSize, User.Stack.Count);
         }
@@ -171,10 +163,9 @@ namespace NunitTests
             User = new Player("Lukas", 0, 0, 0, 20, 100, Stack, Deck);
             StackSize = User.Stack.Count;
             DeckSize = User.Deck.Count;
-            DeckAndStackStatus Success = User.MoveFromStackToDeck(knight.CardId);
             //--------------------------------------------------------------------------------
 
-            Assert.AreEqual(DeckAndStackStatus.Success, Success);
+            Assert.IsTrue(User.MoveFromStackToDeck(knight.CardId));
             Assert.AreEqual(StackSize-1, User.Stack.Count);
             Assert.AreEqual(DeckSize+1, User.Deck.Count);
         }
@@ -197,11 +188,9 @@ namespace NunitTests
             User = new Player("Lukas", 0, 0, 0, 20, 100, Stack, Deck);
             StackSize = User.Stack.Count;
             DeckSize = User.Deck.Count;
-
-            DeckAndStackStatus DeckFull = User.MoveFromStackToDeck(Wizzard.CardId);      
             //--------------------------------------------------------------------------------
 
-            Assert.AreEqual(DeckAndStackStatus.DeckIsFull, DeckFull);
+            Assert.IsFalse(User.MoveFromStackToDeck(Wizzard.CardId));
             Assert.AreEqual(StackSize, User.Stack.Count);
             Assert.AreEqual(DeckSize, User.Deck.Count);
             Assert.AreEqual(5, User.Deck.Count);
@@ -225,9 +214,8 @@ namespace NunitTests
             User = new Player("Lukas", 0, 0, 0, 20, 100, Stack, Deck);
             StackSize = User.Stack.Count;
             DeckSize = User.Deck.Count;
-            DeckAndStackStatus FailureCardNotInStack = User.MoveFromStackToDeck(-1);
             //--------------------------------------------------------------------------------
-            Assert.AreEqual(DeckAndStackStatus.CardNotInStack, FailureCardNotInStack);
+            Assert.IsFalse(User.MoveFromStackToDeck(-1));
             Assert.AreEqual(StackSize, User.Stack.Count);
             Assert.AreEqual(DeckSize, User.Deck.Count);
         }
@@ -243,8 +231,8 @@ namespace NunitTests
             StackSize = User.Stack.Count;
             Coins = User.Coins;
             DeckSize = User.Deck.Count;
-            DeckAndStackStatus Success = User.UserAttemptsCardPurchase(Ork, 20);
-            Assert.AreEqual(DeckAndStackStatus.Success, Success);
+
+            Assert.IsTrue(User.UserAttemptsCardPurchase(Ork, 20));
             Assert.AreEqual(StackSize + 1, User.Stack.Count);
             Assert.AreEqual(Coins-20, User.Coins);
             Assert.AreEqual(DeckSize, User.Deck.Count);
@@ -264,9 +252,8 @@ namespace NunitTests
             StackSize = User.Stack.Count;
             Coins = User.Coins;
             DeckSize = User.Deck.Count;
-            DeckAndStackStatus CardAlreadyOwned = User.UserAttemptsCardPurchase(Ork, 20);
 
-            Assert.AreEqual(DeckAndStackStatus.UserAlreadyOwnsCard, CardAlreadyOwned);
+            Assert.IsFalse(User.UserAttemptsCardPurchase(Ork, 20));
             Assert.AreEqual(StackSize, User.Stack.Count);
             Assert.AreEqual(Coins, User.Coins);
             Assert.AreEqual(DeckSize, User.Deck.Count);
@@ -283,9 +270,8 @@ namespace NunitTests
             StackSize = User.Stack.Count;
             Coins = User.Coins;
             DeckSize = User.Deck.Count;
-            DeckAndStackStatus NotEnoughCoins = User.UserAttemptsCardPurchase(WaterSpell, 20);
 
-            Assert.AreEqual(DeckAndStackStatus.NotEnoughCoins, NotEnoughCoins);
+            Assert.IsFalse(User.UserAttemptsCardPurchase(WaterSpell, 20));
             Assert.AreEqual(StackSize, User.Stack.Count);
             Assert.AreEqual(Coins, User.Coins);
             Assert.AreEqual(DeckSize, User.Deck.Count);
