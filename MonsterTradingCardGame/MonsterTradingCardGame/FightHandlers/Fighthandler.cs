@@ -21,6 +21,7 @@ namespace MCTG.FightHandlers
         protected Player Player2;
         public const int MaxRounds = 100;
         protected Random Dice;
+        public BattleStatus MostRecentStatus { get; protected set; }
         public BattleStatus Status { get; protected set; }
      
         
@@ -49,6 +50,7 @@ namespace MCTG.FightHandlers
             {
                 Player2TempDeck.Add(item.Value);
             }
+            MostRecentStatus = BattleStatus.FightHasntHappened;
         }
 
         protected void BattlelogHeader(bool FirstPlayer)
@@ -78,11 +80,11 @@ namespace MCTG.FightHandlers
             }
             Battlelog += $"--------------------------------------------------------------------------------------------{Environment.NewLine}";
         }
-        protected void FightOneRound(ref List<Card> Attacker, ref List<Card> Defender)
+        protected bool FightOneRound(ref List<Card> Attacker, ref List<Card> Defender)
         {
             if (Attacker.Count == 0|| Defender.Count ==0)
             {
-                return;
+                return false;
             }
             int AttackerIndex = Dice.Next(0, Attacker.Count - 1);
             int DefenderIndex = Dice.Next(0, Defender.Count - 1);
@@ -98,14 +100,14 @@ namespace MCTG.FightHandlers
                 Defender.RemoveAt(DefenderIndex);
                 Attacker.Add(CardOfDefender);
                 Battlelog += $"Deck Size: attacker: {Attacker.Count} defender: {Defender.Count}{Environment.NewLine}";
-                return;
+                return true;
             }
             {
                 Battlelog += $"Winner is the Defender, the defeated Attacker joins our Army {Environment.NewLine}";
                 Attacker.RemoveAt(AttackerIndex);
                 Defender.Add(CardOfAttacker);
                 Battlelog += $"Deck Size: attacker: {Attacker.Count} defender: {Defender.Count}{Environment.NewLine}";
-                return;
+                return true;
             }
         }
         protected void ShuffleTempLists()
@@ -135,7 +137,7 @@ namespace MCTG.FightHandlers
             }
         }
 
-        public BattleStatus Fight()
+        public bool Fight()
         {
             bool PlayerTurn;          
             if (Dice.Next(0, 100)%2 == 1)
@@ -172,27 +174,27 @@ namespace MCTG.FightHandlers
             {
                 Battlelog += $"-------------------------------------------------------------------{Environment.NewLine}";
                 Battlelog += "ITS A TIE";
-                Status = BattleStatus.Tie;
+                MostRecentStatus = BattleStatus.Tie;
                 Player1.IncreaseTie();
                 Player2.IncreaseTie();
-                return Status;
+                return true;
             }else if(Player1TempDeck.Count > Player2TempDeck.Count)
             {
                 Battlelog += $"-------------------------------------------------------------------{Environment.NewLine}";
                 Battlelog += $"Winner is {Player1.PlayerName}{Environment.NewLine}";
-                Status = BattleStatus.Player1Winner;
+                MostRecentStatus = BattleStatus.Player1Winner;
                 Player1.IncreaseWin();
                 Player2.IncreaseLose();
-                return Status;
+                return true;
             }
             else
             {
                 Battlelog += $"-------------------------------------------------------------------{Environment.NewLine}";
                 Battlelog += $"Winner is {Player2.PlayerName}{Environment.NewLine}";
-                Status = BattleStatus.Player2Winner;
+                MostRecentStatus = BattleStatus.Player2Winner;
                 Player2.IncreaseWin();
                 Player1.IncreaseLose();
-                return Status;
+                return true;
             }
         }
     }

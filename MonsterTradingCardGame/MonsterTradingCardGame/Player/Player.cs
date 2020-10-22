@@ -29,6 +29,7 @@ namespace MCTG.Players
         private Mutex PlayerMutex;
         public Dictionary<int, Card> Deck;
         public Dictionary<int, Card> Stack;
+        public string MostRecentStatus { get; private set; }
 
         public Player(string PlayerName, int Win, int Lose, int Tie, int Coins, int Elo)
         {
@@ -41,6 +42,7 @@ namespace MCTG.Players
             this.PlayerMutex = new Mutex();
             this.Deck = new Dictionary<int, Card>();
             this.Stack = new Dictionary<int, Card>();
+            MostRecentStatus = "Nothing has Happened";
         }
         public Player(string PlayerName, int Win, int Lose, int Tie, int Coins, int Elo, Dictionary<int, Card> Stack, Dictionary<int, Card> Deck)
         {
@@ -68,6 +70,7 @@ namespace MCTG.Players
             this.Tie = Tie;
             this.PlayerName = PlayerName;
             this.PlayerMutex = new Mutex();
+            MostRecentStatus = "Nothing has Happened";
         }
         public void IncreaseWin()
         {
@@ -75,6 +78,7 @@ namespace MCTG.Players
             Win++;
             Elo += 5;
             Coins++;
+            MostRecentStatus = "Increase Win,Increase Elo by 5 & Coins by 1";
             PlayerMutex.ReleaseMutex();
         }
         public void IncreaseLose()
@@ -82,6 +86,7 @@ namespace MCTG.Players
             PlayerMutex.WaitOne();
             Lose++;
             Elo -= 3;
+            MostRecentStatus = "Increase Lose,Decrease Elo by 1";
             PlayerMutex.ReleaseMutex();
         }
         public void IncreaseTie()
@@ -89,110 +94,125 @@ namespace MCTG.Players
             PlayerMutex.WaitOne();
             Tie++;
             Elo -= 1;
+            MostRecentStatus = "Increase Tie,Decrease Elo by 1";
             PlayerMutex.ReleaseMutex();
         }
-        public DeckAndStackStatus AddToStack(Card CardInstance)
+        public bool AddToStack(Card CardInstance)
         {
             PlayerMutex.WaitOne();
             if (Stack.ContainsKey(CardInstance.CardId)||Deck.ContainsKey(CardInstance.CardId))
             {
+                MostRecentStatus = $"User already Ownes Card {CardInstance.CardName}";
                 PlayerMutex.ReleaseMutex();
-                return DeckAndStackStatus.UserAlreadyOwnsCard;              
+                return false;              
             }
             else
             {
                 Stack.Add(CardInstance.CardId, CardInstance);
+                MostRecentStatus = "Success";
                 PlayerMutex.ReleaseMutex();
-                return DeckAndStackStatus.Success;
+                return true;
             }
         }
-        public DeckAndStackStatus RemoveFromStack(int CardId)
+        public bool RemoveFromStack(int CardId)
         {
             PlayerMutex.WaitOne();
             if (Stack.ContainsKey(CardId))
             {
                 Stack.Remove(CardId);
+                MostRecentStatus = $"Success";
                 PlayerMutex.ReleaseMutex();
-                return DeckAndStackStatus.Success;
+                return true;
             }
             else
             {
+                MostRecentStatus = $"Card not in Stack";
                 PlayerMutex.ReleaseMutex();
-                return DeckAndStackStatus.CardNotInStack;
+                return false;
             }
         }
-        public DeckAndStackStatus MoveFromDeckToStack(int CardId)
+        public bool MoveFromDeckToStack(int CardId)
         {
             PlayerMutex.WaitOne();
             if (Deck.ContainsKey(CardId))
             {
                 if (Stack.ContainsKey(CardId))
                 {
+                    MostRecentStatus = $"Card Already in Stack";
                     PlayerMutex.ReleaseMutex();
-                    return DeckAndStackStatus.CardAlreadyInStack;
+                    return false;
                 }
                 else
                 {
                     Stack.Add(CardId, Deck[CardId]);
                     Deck.Remove(CardId);
+                    MostRecentStatus = $"Succes";
                     PlayerMutex.ReleaseMutex();
-                    return DeckAndStackStatus.Success;
+                    return true;
                 }
             }
             else
-            {
+            {             
+                MostRecentStatus = $"Card not in Deck";
                 PlayerMutex.ReleaseMutex();
-                return DeckAndStackStatus.CardNotInDeck;
+                return false;
             }
         }
-        public DeckAndStackStatus MoveFromStackToDeck(int CardId)
+        public bool MoveFromStackToDeck(int CardId)
         {
             PlayerMutex.WaitOne();
             if (Deck.Count >= 5)
             {
+                MostRecentStatus = $"Deck is Full";
                 PlayerMutex.ReleaseMutex();
-                return DeckAndStackStatus.DeckIsFull;
+                return false;
             }
             if (Stack.ContainsKey(CardId))
             {
                 if (Deck.ContainsKey(CardId))
                 {
+                    MostRecentStatus = $"Card Already in Deck";
                     PlayerMutex.ReleaseMutex();
-                    return DeckAndStackStatus.CardAlreadyInDeck;
+                    return false;
                 }
                 else
                 {
                     Deck.Add(CardId, Stack[CardId]);
                     Stack.Remove(CardId);
+                    MostRecentStatus = $"Success";
                     PlayerMutex.ReleaseMutex();
-                    return DeckAndStackStatus.Success;
+                    return true;
                 }
             }
             else
             {
+                MostRecentStatus = $"Card not in Stack";
                 PlayerMutex.ReleaseMutex();
-                return DeckAndStackStatus.CardNotInStack;
+                return false;
             }
         }
-        public DeckAndStackStatus UserAttemptsCardPurchase(Card BuyThisCard, int Price)
+        public bool UserAttemptsCardPurchase(Card BuyThisCard, int Price)
         {
             PlayerMutex.WaitOne();
             if (Stack.ContainsKey(BuyThisCard.CardId) || Deck.ContainsKey(BuyThisCard.CardId))
             {
+                MostRecentStatus = $"Card already owned";
                 PlayerMutex.ReleaseMutex();
-                return DeckAndStackStatus.UserAlreadyOwnsCard;
+                return false;
             }
             else
             {
                 if (this.Coins - Price < 0)
                 {
+                    MostRecentStatus = $"Not enough Coins";
                     PlayerMutex.ReleaseMutex();
-                    return DeckAndStackStatus.NotEnoughCoins;
+                    return false;
                 }
                 Stack.Add(BuyThisCard.CardId, BuyThisCard);
                 this.Coins -= Price;
+                MostRecentStatus = $"Success";
                 PlayerMutex.ReleaseMutex();
-                return DeckAndStackStatus.Success;
+                return true;
             }
         }
     }

@@ -39,25 +39,25 @@ namespace MCTG.FightHandlers
         {
             Random OldDice = Dice;
             Dice = new Random(1);
-            BattleStatus returnvalue = this.Fight();
+            this.Fight();
             Dice = OldDice;
-            return returnvalue;
+            return MostRecentStatus;
         }
         public BattleStatus FullFightWinnerPlayer2_RiggedDice()
         {
             Random OldDice = Dice;
             Dice = new Random(999999999);
-            BattleStatus returnvalue = this.Fight();
-            Dice = OldDice;
-            return returnvalue;
+            this.Fight();
+            Dice = OldDice;           
+            return MostRecentStatus;
         }
         public BattleStatus FullFightWinnerTie_RiggedDice()
         {
             Random OldDice = Dice;
             Dice = new Random(999999999);
-            BattleStatus returnvalue = this.Fight();
+            this.Fight();
             Dice = OldDice;
-            return returnvalue;
+            return MostRecentStatus;
         }
         public int FindTie()
         {
@@ -66,7 +66,8 @@ namespace MCTG.FightHandlers
             for(int i=0; i< 1000000; i++)
             {
                 x = (x * 2656) % sizeof(int);
-                if (this.Fight() == BattleStatus.Tie)
+                this.Fight();
+                if (MostRecentStatus == BattleStatus.Tie)
                 {
                     return x;
                 }
