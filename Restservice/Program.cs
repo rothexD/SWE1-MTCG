@@ -102,72 +102,62 @@ namespace WebserviceRest
         public bool Parse()
         {
             ResetContext();
-            Byte[] bytes = new Byte[4000];
-            String data = null;
+            Byte[] bytes = new Byte[2000];
+            String data = "";
             string[] SplitByEndline = null;
             string[] SplitBuffer = null;
             bool RecievingHTTPMessage = false;
-            string Buffer ="";
+
             int i = 0;
             int counter = 0;
             while ((i = Stream.Read(bytes, 0, bytes.Length)) != 0)
             {
-                if (!RecievingHTTPMessage)
-                {
-                    data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-                    data = Buffer + data;
-                    Buffer = "";
-                    SplitByEndline = data.Split('\n');
-                    if (counter == 0)
-                    {
-                        SplitBuffer = SplitByEndline[0].Split(' ');
-                        if (SplitBuffer.Length < 3)
-                        {
-                            return false;
-                        }
-                        HTTPVerb = SplitBuffer[0];
-                        MessageEndPoint = SplitBuffer[1];
-                        HttpProtokoll = SplitBuffer[2];
-                        SplitByEndline[0] = "\n\n\n\0";
-                        counter++;
-                    }
-                    foreach (string SubStringNotTrimmed in SplitByEndline)
-                    {
-                        string SubString = SubStringNotTrimmed.Trim('\r');
-                        if (SubString == "\n\n\n\0")
-                        {
-                            continue;
-                        }                     
-                        if (SubString.Length == 0) 
-                        {
-                            RecievingHTTPMessage = true;
-                            continue;
-                        }
-                        if (!RecievingHTTPMessage)
-                        {
-                            SplitBuffer = SubString.Split(new[] { ':' }, 2);
-                            if (SplitBuffer.Length == 1)
-                            {
-                                Buffer = SubString;
-                                continue;
-                            }
-                            //https://stackoverflow.com/questions/21519548/split-string-based-on-the-first-occurrence-of-the-character
-                            Headers.Add(SplitBuffer[0], SplitBuffer[1].Trim(' '));
-                        }
-                        else
-                        {
-                            PayLoad += SubString + '\n';
-                            continue;
-                        }
-                    }
-                }
-                else
-                {
-                    PayLoad += data;
-                }
+                data += System.Text.Encoding.ASCII.GetString(bytes, 0, i);
                 if (!Stream.DataAvailable)
                 {
                     break;
+                }
+            }
+            SplitByEndline = data.Split('\n');
+            foreach(string item in SplitByEndline)
+            {
+                item.Trim('\r');
+            }
+            SplitBuffer = SplitByEndline[0].Split(' ');
+            if (SplitBuffer.Length < 3)
+            {
+                return false;
+            }
+            HTTPVerb = SplitBuffer[0];
+            MessageEndPoint = SplitBuffer[1];
+            HttpProtokoll = SplitBuffer[2];
+            SplitByEndline[0] = "\n\n\n\0";
+            foreach (string SubString in SplitByEndline)
+            {
+                if (SubString == "\n\n\n\0")
+                {
+                    continue;
+                }
+                if (!RecievingHTTPMessage)
+                {
+                    if (SubString.Length == 0)
+                    {
+                        RecievingHTTPMessage = true;
+                        continue;
+                    }
+                    //https://stackoverflow.com/questions/21519548/split-string-based-on-the-first-occurrence-of-the-character
+                    SplitBuffer = SubString.Split(new[] { ':' }, 2);
+                    if (SplitBuffer.Length == 1)
+                    {
+                        RecievingHTTPMessage = true;
+                        continue;
+                    }
+                    Headers.Add(SplitBuffer[0], SplitBuffer[1].Trim(' '));
+                }
+                else
+                {
+                    PayLoad += SubString + '\n';
+                    continue;
                 }
             }
             PayLoad = PayLoad.Trim('\n');
@@ -212,10 +202,10 @@ namespace WebserviceRest
             {
                 return false;
             }
-            string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\n";
+            string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\r\n";
             foreach (var item in DicionaryHeaders)
             {
-                Response+=$"{item.Key}: {item.Value}\n";
+                Response+=$"{item.Key}: {item.Value}\r\n";
             }
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(Response);
             Stream.Write(msg, 0, msg.Length);
@@ -227,12 +217,12 @@ namespace WebserviceRest
             {
                 return false;
             }
-            string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\n";
+            string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\r\n";
             foreach (var item in DicionaryHeaders)
             {
-                Response += $"{item.Key}: {item.Value}\n";
+                Response += $"{item.Key}: {item.Value}\r\n";
             }
-            Response += $"Content-Length: {Message.Length}\n\n{Message}";
+            Response += $"Content-Length: {Message.Length}\r\n\r\n{Message}";
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(Response);
             Stream.Write(msg, 0, msg.Length);
             return true;
@@ -243,10 +233,10 @@ namespace WebserviceRest
             {
                 return false;
             }
-             string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\nCache-Control: no-cache\nDate: {DateTime.Now}\nConnection: Closed";
+             string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\r\nCache-Control: no-cache\nDate: {DateTime.Now}\r\nConnection: Closed";
              byte[] msg = System.Text.Encoding.ASCII.GetBytes(Response);
              Stream.Write(msg, 0, msg.Length);
-             return true;
+            return true;
         }
         public bool SendDefaultMessage(NetworkStream Stream, string StatusCode, string Message)
         {
@@ -254,7 +244,7 @@ namespace WebserviceRest
             {
                 return false;
             }
-            string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\nCache-Control: no-cache\nDate: {DateTime.Now}\nConnection: Closed\nContent-Type: raw\nContent-Length: {Message.Length}\n\n{Message}";
+            string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\r\nCache-Control: no-cache\r\nDate: {DateTime.Now}\r\nConnection: Closed\r\nContent-Type: raw\r\nContent-Length: {Message.Length}\r\n\r\n{Message}";
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(Response);
             Stream.Write(msg, 0, msg.Length);
             return true;
@@ -372,6 +362,7 @@ namespace WebserviceRest
                         break;
                     }
                 case ("PUT"):
+                    Console.WriteLine("ENTERED PUT");
                     if (EndPointArray.Length == 3 && EndPointArray[1] == "messages")
                     {
                         int MessageIDFromHttpRequest = ToInt(EndPointArray[2]);
@@ -424,28 +415,32 @@ namespace WebserviceRest
                 return -1;
             }
         }
-        static void ProcessConnection(ref Mutex MessageListMutex,ref int MessageCounter,ref Dictionary<int, string> MessageList,ServerTcpListener Server, TcpClient client)
+        static void PrintConnectionDetails(RequestContext HTTPrequest)
+        {
+            Console.Write(Environment.NewLine);
+            Console.WriteLine("-----------------------------------------------------");
+            Console.WriteLine("HTTP-Verb: " + HTTPrequest.HTTPVerb);
+            Console.WriteLine("HttpProtokoll: " + HTTPrequest.HttpProtokoll);
+            Console.WriteLine("MessageEndPoint: " + HTTPrequest.MessageEndPoint);
+            Console.Write(Environment.NewLine);
+            HTTPrequest.printdictionary();
+            Console.Write(Environment.NewLine);
+            if (HTTPrequest.PayLoad.Length > 0)
+            {
+                Console.WriteLine("PayLoad " + HTTPrequest.PayLoad.Length + ":\n" + HTTPrequest.PayLoad + "");
+            }
+            Console.WriteLine("-----------------------------------------------------");
+            Console.Write(Environment.NewLine);
+        }
+        static void ProcessConnection(ref Mutex MessageListMutex,ref int MessageCounter,ref Dictionary<int, string> MessageList,ServerTcpListener Server,ref TcpClient client)
         {
             RequestContext HTTPrequest = Server.GetRequestInformationFromConnection(client);
            
             HTTPResponseWrapper ResponseHandler = new HTTPResponseWrapper();
-
+    
             if (HTTPrequest != null)
             {
-                
-                Console.WriteLine("HTTP-Verb: " + HTTPrequest.HTTPVerb);
-                Console.WriteLine("HttpProtokoll: " + HTTPrequest.HttpProtokoll);
-                Console.WriteLine("MessageEndPoint: " + HTTPrequest.MessageEndPoint);
-                HTTPrequest.printdictionary();
-                if (HTTPrequest.PayLoad.Length > 0)
-                {
-                    Console.WriteLine("PayLoad " + HTTPrequest.PayLoad.Length + ":\n" + HTTPrequest.PayLoad + "");
-                }
-                else
-                {
-                    Console.Write("no payload\n");
-                }
-                
+                PrintConnectionDetails(HTTPrequest);
             }
             else
             {
@@ -482,11 +477,12 @@ namespace WebserviceRest
             {               
                     Console.WriteLine("Waiting for a connection... ");
                     TcpClient client = Server.ListenForConnection();
-                    Thread ThreadToProcessClient = new Thread(delegate () { ProcessConnection(ref MessageListMutex, ref MessageCounter, ref MessageList,Server, client); });
+                    Thread ThreadToProcessClient = new Thread(delegate () { ProcessConnection(ref MessageListMutex, ref MessageCounter, ref MessageList,Server,ref client); });
+                    ThreadToProcessClient.Name = "Hans";
                     ThreadList.Add(client, ThreadToProcessClient);
                     ThreadToProcessClient.Start();
 
-                    Console.WriteLine("Clean Up");
+                    /*Console.WriteLine("Clean Up");
 
                     List<TcpClient>TempList = new List<TcpClient>();
                     foreach (var item in ThreadList)
@@ -501,7 +497,7 @@ namespace WebserviceRest
                     {
                     ThreadList.Remove(item);
                     Console.WriteLine("Removed thread from List");
-                    }
+                    }*/
             }
         }
     }
