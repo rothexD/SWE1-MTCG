@@ -5,257 +5,20 @@ using System.Text;
 using System.Threading;
 using System.Net;
 using System.Net.Sockets;
+using Restservice.Http_Service;
+using Restservice.Server;
 /* used documentation to implement code:
  * TcpSocket Listener https://docs.microsoft.com/en-us/dotnet/api/system.net.sockets.tcplistener?view=netcore-3.1
  * HttpListener https://stackoverflow.com/questions/9742663/how-do-i-make-http-requests-to-a-tcp-server not allowed but inspiration taken
  */
 namespace WebserviceRest
 {
-    class ServerTcpListener
+    public class Program
     {
-        public TcpListener Server { get; private set; }
-        public IPAddress Adress { get; private set; }
-        public int Port = 1235;
-
-
-        public ServerTcpListener()
-        {      
-            Adress = IPAddress.Parse("127.0.0.1");
-            Port = 1235;
-            Server = new TcpListener(Adress, Port);
-        }
-        public ServerTcpListener(string MyAdress,int Port)
+        public static Mutex MessageListMutex = new Mutex();
+        static public void endpointMessage(HTTPResponseWrapperInterface ResponseHandler, RequestContextInterface HTTPrequest,ref Dictionary<int, string> MessageList,ref int MessageCounter)
         {
-            this.Adress = IPAddress.Parse(MyAdress);
-            this.Port = Port;
-            Server = new TcpListener(Adress, Port);
-        }
-        public void StartServer()
-        {
-            Server.Start();
-        }
-        public TcpClient ListenForConnection()
-        {
-            return Server.AcceptTcpClient();
-        }
-        public RequestContext GetRequestInformationFromConnection(TcpClient Client)
-        {
-            NetworkStream Stream = Client.GetStream();
-            RequestContext RequestInformation = new RequestContext(Client, Stream);
-            if (RequestInformation.Parse())
-            {
-                return RequestInformation;
-            }
-            else
-            {
-                return null;
-            }
-        }
-    }
-    class RequestContext
-    {
-        //https://stackoverflow.com/questions/21312870/how-to-access-private-variables-using-get-set
-        public string HTTPVerb { get; private set; }
-        public string HttpProtokoll { get; private set; }
-        public string MessageEndPoint { get; private set; }
-        public Dictionary<string, string> Headers { get; private set; }
-        public string PayLoad { get; private set; }
-        public TcpClient Client { get; private set; } 
-        public NetworkStream Stream { get; private set; }
-        public RequestContext(TcpClient Client,NetworkStream Stream)
-        {
-            this.Client = Client;
-            this.Stream = Stream;
-            Headers = new Dictionary<string, string>();
-            HTTPVerb = "";
-            HttpProtokoll = "";
-            MessageEndPoint = "";
-            Headers.Clear();
-            PayLoad = "";
-        }
-        public string[] ResolveEndPointToStringArray()
-        {
-            return MessageEndPoint.Split('/');
-        }
-        public void ResetContext()
-        {
-            //https://stackoverflow.com/questions/1978821/how-to-reset-a-dictionary
-            HTTPVerb = "";
-            HttpProtokoll = "";
-            MessageEndPoint = "";
-            Headers.Clear();
-            PayLoad = "";
-        }
-        public string SearchInDictionaryByKey(string FindThisKey)
-        {
-            //https://stackoverflow.com/questions/5531042/how-to-find-item-in-dictionary-collection
-            string Output = "";
-            if (Headers.TryGetValue(FindThisKey, out Output))
-            {
-                return Output;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        public bool Parse()
-        {
-            ResetContext();
-            Byte[] bytes = new Byte[2000];
-            String data = "";
-            string[] SplitByEndline = null;
-            string[] SplitBuffer = null;
-            bool RecievingHTTPMessage = false;
-
-            int i = 0;
-            int counter = 0;
-            while ((i = Stream.Read(bytes, 0, bytes.Length)) != 0)
-            {
-                data += System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-                if (!Stream.DataAvailable)
-                {
-                    break;
-                }
-            }
-            SplitByEndline = data.Split('\n');
-            foreach(string item in SplitByEndline)
-            {
-                item.Trim('\r');
-            }
-            SplitBuffer = SplitByEndline[0].Split(' ');
-            if (SplitBuffer.Length < 3)
-            {
-                return false;
-            }
-            HTTPVerb = SplitBuffer[0];
-            MessageEndPoint = SplitBuffer[1];
-            HttpProtokoll = SplitBuffer[2];
-            SplitByEndline[0] = "\n\n\n\0";
-            foreach (string SubString in SplitByEndline)
-            {
-                if (SubString == "\n\n\n\0")
-                {
-                    continue;
-                }
-                if (!RecievingHTTPMessage)
-                {
-                    if (SubString.Length == 0)
-                    {
-                        RecievingHTTPMessage = true;
-                        continue;
-                    }
-                    //https://stackoverflow.com/questions/21519548/split-string-based-on-the-first-occurrence-of-the-character
-                    SplitBuffer = SubString.Split(new[] { ':' }, 2);
-                    if (SplitBuffer.Length == 1)
-                    {
-                        RecievingHTTPMessage = true;
-                        continue;
-                    }
-                    Headers.Add(SplitBuffer[0], SplitBuffer[1].Trim(' '));
-                }
-                else
-                {
-                    PayLoad += SubString + '\n';
-                    continue;
-                }
-            }
-            PayLoad = PayLoad.Trim('\n');
-            return true;
-        }
-        public void printdictionary()
-        {
-            foreach (var item in Headers)
-            {
-                Console.WriteLine(item.Key + " : " + item.Value);
-            }
-        }
-    }
-    class HTTPResponseWrapper
-    {
-        public Dictionary<string,string> DicionaryHeaders { get;set;}
-
-        public HTTPResponseWrapper()
-        {
-            DicionaryHeaders = new Dictionary<string, string>();
-            ResetContext();
-        }
-        public void ResetContext()
-        {
-            DicionaryHeaders.Clear();
-        }
-        private string ResolveHTTPStatuscode(string StatusCode)
-        {
-            switch (StatusCode)
-            {
-                case ("200"): return "OK";
-                case ("400"): return "Bad Request";
-                case ("404"): return "Not Found";
-                case ("201"): return "Created";
-                case ("501"): return "Not Implemented";
-                default: return "Unknown StatusCode";
-            }
-        }
-        public bool SendResponseByTcp(NetworkStream Stream,string StatusCode)
-        {
-            if(StatusCode == "")
-            {
-                return false;
-            }
-            string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\r\n";
-            foreach (var item in DicionaryHeaders)
-            {
-                Response+=$"{item.Key}: {item.Value}\r\n";
-            }
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(Response);
-            Stream.Write(msg, 0, msg.Length);
-            return true;
-        }
-        public bool SendMessageByTcp(NetworkStream Stream, string StatusCode,string Message)
-        {
-            if (StatusCode == "")
-            {
-                return false;
-            }
-            string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\r\n";
-            foreach (var item in DicionaryHeaders)
-            {
-                Response += $"{item.Key}: {item.Value}\r\n";
-            }
-            Response += $"Content-Length: {Message.Length}\r\n\r\n{Message}";
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(Response);
-            Stream.Write(msg, 0, msg.Length);
-            return true;
-        }
-        public bool SendDefaultStatus(NetworkStream Stream, string StatusCode)
-        {
-            if (StatusCode == "")
-            {
-                return false;
-            }
-             string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\r\nCache-Control: no-cache\nDate: {DateTime.Now}\r\nConnection: Closed";
-             byte[] msg = System.Text.Encoding.ASCII.GetBytes(Response);
-             Stream.Write(msg, 0, msg.Length);
-            return true;
-        }
-        public bool SendDefaultMessage(NetworkStream Stream, string StatusCode, string Message)
-        {
-            if (StatusCode == "")
-            {
-                return false;
-            }
-            string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\r\nCache-Control: no-cache\r\nDate: {DateTime.Now}\r\nConnection: Closed\r\nContent-Type: raw\r\nContent-Length: {Message.Length}\r\n\r\n{Message}";
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(Response);
-            Stream.Write(msg, 0, msg.Length);
-            return true;
-        }
-    }
-    class Program
-    {
-        private static Mutex MessageListMutex = new Mutex();
-        private static Mutex MessageCounterMutex = new Mutex();
-        static public void endpointMessage(NetworkStream Stream,HTTPResponseWrapper ResponseHandler, RequestContext HTTPrequest,string[] EndPointArray, Dictionary<int, string> MessageList,ref int MessageCounter)
-        {
+            string[] EndPointArray = HTTPrequest.ResolveEndPointToStringArray();
             switch (HTTPrequest.HTTPVerb)
             {
                 case ("GET"):
@@ -270,7 +33,7 @@ namespace WebserviceRest
                         }
                         MessageListMutex.ReleaseMutex();
                         //respond with OK Message
-                        ResponseHandler.SendDefaultMessage(Stream, "200", Response);
+                        ResponseHandler.SendDefaultMessage(HTTPrequest.Stream, "200", Response);
                         break;
                     }
                     else if (EndPointArray.Length == 3 && EndPointArray[1] == "messages")
@@ -285,28 +48,28 @@ namespace WebserviceRest
                                 MessageListMutex.ReleaseMutex();
                                 string Response = $"Message {MessageIDFromHttpRequest}: {Output}\n";
                                 //respond with OK Message
-                                ResponseHandler.SendDefaultMessage(Stream, "200", Response);
+                                ResponseHandler.SendDefaultMessage(HTTPrequest.Stream, "200", Response);
                                 break;
                             }
                             else
                             {
                                 MessageListMutex.ReleaseMutex();
                                 //respond Message not found;
-                                ResponseHandler.SendDefaultStatus(Stream, "404");
+                                ResponseHandler.SendDefaultStatus(HTTPrequest.Stream, "404");
                                 break;
                             }
                         }
                         else
                         {
                             //respond with bad Formatting
-                            ResponseHandler.SendDefaultStatus(Stream, "400");
+                            ResponseHandler.SendDefaultStatus(HTTPrequest.Stream, "400");
                             break;
                         }
                     }
                     else
                     {
                         //respond with error MEssageEndPoint not exists
-                        ResponseHandler.SendDefaultStatus(Stream, "404");
+                        ResponseHandler.SendDefaultStatus(HTTPrequest.Stream, "404");
                         break;
                     }
                 case ("POST"):
@@ -317,13 +80,13 @@ namespace WebserviceRest
                         int tempMessageCounter = MessageCounter;
                         MessageCounter++;
                         MessageListMutex.ReleaseMutex();
-                        ResponseHandler.SendDefaultMessage(Stream, "201", tempMessageCounter.ToString());                 
+                        ResponseHandler.SendDefaultMessage(HTTPrequest.Stream, "201", tempMessageCounter.ToString());                 
                         break;
                     }
                     else
                     {
                         //respond bad endpoint;
-                        ResponseHandler.SendDefaultStatus(Stream, "404");
+                        ResponseHandler.SendDefaultStatus(HTTPrequest.Stream, "404");
                         break;
                     }
                 case ("DELETE"):
@@ -337,28 +100,28 @@ namespace WebserviceRest
                             {
                                 MessageList.Remove(MessageIDFromHttpRequest);
                                 MessageListMutex.ReleaseMutex();                              
-                                ResponseHandler.SendDefaultStatus(Stream, "200");
+                                ResponseHandler.SendDefaultStatus(HTTPrequest.Stream, "200");
                                 break;
                             }
                             else
                             {
                                 MessageListMutex.ReleaseMutex();
                                 //respond with bad MessageEndPoint
-                                ResponseHandler.SendDefaultStatus(Stream, "404");
+                                ResponseHandler.SendDefaultStatus(HTTPrequest.Stream, "404");
                                 break;
                             }
                         }
                         else
                         {
                             //respond with bad Formatting
-                            ResponseHandler.SendDefaultStatus(Stream, "400");
+                            ResponseHandler.SendDefaultStatus(HTTPrequest.Stream, "400");
                             break;
                         }
                     }
                     else
                     {
                         //respond with bad MessageEndPoint
-                        ResponseHandler.SendDefaultStatus(Stream, "404");
+                        ResponseHandler.SendDefaultStatus(HTTPrequest.Stream, "404");
                         break;
                     }
                 case ("PUT"):
@@ -374,33 +137,33 @@ namespace WebserviceRest
                                 MessageList[MessageIDFromHttpRequest] = HTTPrequest.PayLoad;
                                 MessageListMutex.ReleaseMutex();
                                 //respond with ok
-                                ResponseHandler.SendDefaultStatus(Stream, "200");
+                                ResponseHandler.SendDefaultStatus(HTTPrequest.Stream, "200");
                                 break;
                             }
                             else
                             {
                                 MessageListMutex.ReleaseMutex();
                                 //respond with bad MessageEndPoint
-                                ResponseHandler.SendDefaultStatus(Stream, "404");
+                                ResponseHandler.SendDefaultStatus(HTTPrequest.Stream, "404");
                                 break;
                             }
                         }
                         else
                         {
                             //respond with bad Formatting
-                            ResponseHandler.SendDefaultStatus(Stream, "400");
+                            ResponseHandler.SendDefaultStatus(HTTPrequest.Stream, "400");
                         }
                     }
                     else
                     {
                         //respond with bad MessageEndPoint
-                        ResponseHandler.SendDefaultStatus(Stream, "404");
+                        ResponseHandler.SendDefaultStatus(HTTPrequest.Stream, "404");
                         break;
                     }
                     break;
                 default:
                     //respond with HTTPverb not implemented
-                    ResponseHandler.SendDefaultStatus(Stream, "501"); ;
+                    ResponseHandler.SendDefaultStatus(HTTPrequest.Stream, "501"); ;
                     break;
             }
         }
@@ -415,7 +178,7 @@ namespace WebserviceRest
                 return -1;
             }
         }
-        static void PrintConnectionDetails(RequestContext HTTPrequest)
+        static void PrintConnectionDetails(RequestContextInterface HTTPrequest)
         {
             Console.Write(Environment.NewLine);
             Console.WriteLine("-----------------------------------------------------");
@@ -434,9 +197,9 @@ namespace WebserviceRest
         }
         static void ProcessConnection(ref Mutex MessageListMutex,ref int MessageCounter,ref Dictionary<int, string> MessageList,ServerTcpListener Server,ref TcpClient client)
         {
-            RequestContext HTTPrequest = Server.GetRequestInformationFromConnection(client);
-           
-            HTTPResponseWrapper ResponseHandler = new HTTPResponseWrapper();
+            RequestContextInterface HTTPrequest = Server.GetRequestInformationFromConnection(client);
+
+            HTTPResponseWrapperInterface ResponseHandler = new HTTPResponseWrapper();
     
             if (HTTPrequest != null)
             {
@@ -456,7 +219,7 @@ namespace WebserviceRest
                 client.Close();
                 return;
             }
-            endpointMessage(HTTPrequest.Stream, ResponseHandler, HTTPrequest, UrlSplitBySlash, MessageList, ref MessageCounter);
+            endpointMessage(ResponseHandler, HTTPrequest,ref MessageList, ref MessageCounter);
             Console.WriteLine("Thread finished and Client closed");
             client.Close();         
             return;

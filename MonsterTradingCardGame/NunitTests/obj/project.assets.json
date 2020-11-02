@@ -1290,6 +1290,16 @@
         "runtime": {
           "bin/placeholder/MCTG.dll": {}
         }
+      },
+      "Restservice/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v3.1",
+        "compile": {
+          "bin/placeholder/Restservice.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Restservice.dll": {}
+        }
       }
     }
   },
@@ -4819,6 +4829,11 @@
       "type": "project",
       "path": "../MonsterTradingCardGame/MCTG.csproj",
       "msbuildProject": "../MonsterTradingCardGame/MCTG.csproj"
+    },
+    "Restservice/1.0.0": {
+      "type": "project",
+      "path": "../../Restservice/Restservice.csproj",
+      "msbuildProject": "../../Restservice/Restservice.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -4827,6 +4842,7 @@
       "Microsoft.NET.Test.Sdk >= 16.4.0",
       "Moq >= 4.14.6",
       "NUnit3TestAdapter >= 3.15.1",
+      "Restservice >= 1.0.0",
       "nunit >= 3.12.0"
     ]
   },
@@ -4858,6 +4874,9 @@
           "projectReferences": {
             "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\MonsterTradingCardGame\\MonsterTradingCardGame\\MCTG.csproj": {
               "projectPath": "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\MonsterTradingCardGame\\MonsterTradingCardGame\\MCTG.csproj"
+            },
+            "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\Restservice\\Restservice.csproj": {
+              "projectPath": "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\Restservice\\Restservice.csproj"
             }
           }
         }
