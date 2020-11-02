@@ -16,6 +16,7 @@ namespace WebserviceRest
     public class Program
     {
         public static Mutex MessageListMutex = new Mutex();
+        Dictionary<int, string> MessageList;
         static public void endpointMessage(HTTPResponseWrapperInterface ResponseHandler, RequestContextInterface HTTPrequest,ref Dictionary<int, string> MessageList,ref int MessageCounter)
         {
             string[] EndPointArray = HTTPrequest.ResolveEndPointToStringArray();
@@ -195,7 +196,7 @@ namespace WebserviceRest
             Console.WriteLine("-----------------------------------------------------");
             Console.Write(Environment.NewLine);
         }
-        static void ProcessConnection(ref Mutex MessageListMutex,ref int MessageCounter,ref Dictionary<int, string> MessageList,ServerTcpListener Server,ref TcpClient client)
+        static void ProcessConnection(ref int MessageCounter,ref Dictionary<int, string> MessageList,ServerTcpListener Server,ref TcpClient client)
         {
             RequestContextInterface HTTPrequest = Server.GetRequestInformationFromConnection(client);
 
@@ -226,7 +227,7 @@ namespace WebserviceRest
         }
         static void Main(string[] args)
         {          
-            Dictionary<int,string> MessageList = new Dictionary<int, string>();
+            MessageList = new Dictionary<int, string>();
             Byte[] bytes = new Byte[256];
             int MessageCounter = 0;
             MessageList.Add(0, "Hallo");
@@ -240,7 +241,7 @@ namespace WebserviceRest
             {               
                     Console.WriteLine("Waiting for a connection... ");
                     TcpClient client = Server.ListenForConnection();
-                    Thread ThreadToProcessClient = new Thread(delegate () { ProcessConnection(ref MessageListMutex, ref MessageCounter, ref MessageList,Server,ref client); });
+                    Thread ThreadToProcessClient = new Thread(delegate () { ProcessConnection(ref MessageCounter, ref MessageList,Server,ref client); });
                     ThreadToProcessClient.Name = "Hans";
                     ThreadList.Add(client, ThreadToProcessClient);
                     ThreadToProcessClient.Start();

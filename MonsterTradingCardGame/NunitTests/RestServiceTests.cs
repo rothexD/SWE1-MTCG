@@ -42,12 +42,23 @@ namespace NunitTests
             MessageList.Add(1, "abc");
             counter = MessageList.Count;
         }
+        private void SetupMockRequestContext(string verb, string protkoll, string endpoint)
+        {
+            RequestContext.Setup(_ => _.HTTPVerb).Returns(verb);
+            RequestContext.Setup(_ => _.HttpProtokoll).Returns(protkoll);
+            RequestContext.Setup(_ => _.MessageEndPoint).Returns(endpoint);
+        }
+        private void SetupMockRequestContext(string verb, string protkoll, string endpoint, string payload)
+        {
+            RequestContext.Setup(_ => _.HTTPVerb).Returns(verb);
+            RequestContext.Setup(_ => _.HttpProtokoll).Returns(protkoll);
+            RequestContext.Setup(_ => _.MessageEndPoint).Returns(endpoint);
+            RequestContext.Setup(_ => _.PayLoad).Returns(payload);
+        }
         [Test]
         public void testEndPoint_get_200_normalrequest()
-        {            
-            RequestContext.Setup(_ => _.HTTPVerb).Returns("GET");
-            RequestContext.Setup(_ => _.HttpProtokoll).Returns("HTTP1.0");
-            RequestContext.Setup(_ => _.MessageEndPoint).Returns("/messages");       
+        {
+            SetupMockRequestContext("GET", "HTTP1.0", "/messages");  
         
             Program.MessageListMutex = new Mutex();
             Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
@@ -57,9 +68,7 @@ namespace NunitTests
         [Test]
         public void testEndPoint_get_404_emptyrequest()
         {
-            RequestContext.Setup(_ => _.HTTPVerb).Returns("GET");
-            RequestContext.Setup(_ => _.HttpProtokoll).Returns("HTTP1.0");
-            RequestContext.Setup(_ => _.MessageEndPoint).Returns("");
+            SetupMockRequestContext("GET", "HTTP1.0", "");
 
             Program.MessageListMutex = new Mutex();
             Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
@@ -68,9 +77,7 @@ namespace NunitTests
         [Test]
         public void testEndPoint_get_404_noleadingslash()
         {
-            RequestContext.Setup(_ => _.HTTPVerb).Returns("GET");
-            RequestContext.Setup(_ => _.HttpProtokoll).Returns("HTTP1.0");
-            RequestContext.Setup(_ => _.MessageEndPoint).Returns("messages");
+            SetupMockRequestContext("GET", "HTTP1.0", "messages");
 
             Program.MessageListMutex = new Mutex();
             Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
@@ -79,9 +86,7 @@ namespace NunitTests
         [Test]
         public void testEndPoint_get_200_normalrequesttospecificendpoint()
         {
-            RequestContext.Setup(_ => _.HTTPVerb).Returns("GET");
-            RequestContext.Setup(_ => _.HttpProtokoll).Returns("HTTP1.0");
-            RequestContext.Setup(_ => _.MessageEndPoint).Returns("/messages/0");
+            SetupMockRequestContext("GET", "HTTP1.0", "/messages/0");
             
             Program.MessageListMutex = new Mutex();
             Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
@@ -90,9 +95,7 @@ namespace NunitTests
         [Test]
         public void testEndPoint_get_404_messagedoesnotexist()
         {
-            RequestContext.Setup(_ => _.HTTPVerb).Returns("GET");
-            RequestContext.Setup(_ => _.HttpProtokoll).Returns("HTTP1.0");
-            RequestContext.Setup(_ => _.MessageEndPoint).Returns("/messages/3");
+            SetupMockRequestContext("GET", "HTTP1.0", "/messages/3");
 
             Program.MessageListMutex = new Mutex();
             Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
@@ -101,9 +104,7 @@ namespace NunitTests
         [Test]
         public void testEndPoint_Post_404_posttoinvalidendpoint()
         {
-            RequestContext.Setup(_ => _.HTTPVerb).Returns("POST");
-            RequestContext.Setup(_ => _.HttpProtokoll).Returns("HTTP1.0");
-            RequestContext.Setup(_ => _.MessageEndPoint).Returns("/messages/3");
+            SetupMockRequestContext("POST", "HTTP1.0", "/messages/3");
 
             Program.MessageListMutex = new Mutex();
             Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
@@ -112,10 +113,7 @@ namespace NunitTests
         [Test]
         public void testEndPoint_Post_201_postcreated()
         {
-            RequestContext.Setup(_ => _.HTTPVerb).Returns("POST");
-            RequestContext.Setup(_ => _.HttpProtokoll).Returns("HTTP1.0");
-            RequestContext.Setup(_ => _.MessageEndPoint).Returns("/messages");
-            RequestContext.Setup(_ => _.PayLoad).Returns("PostTest");
+            SetupMockRequestContext("POST", "HTTP1.0", "/messages", "PostTest");
 
             Program.MessageListMutex = new Mutex();
             Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
@@ -126,10 +124,7 @@ namespace NunitTests
         [Test]
         public void testEndPoint_Post_404_invalidendpointalphanumeric()
         {
-            RequestContext.Setup(_ => _.HTTPVerb).Returns("POST");
-            RequestContext.Setup(_ => _.HttpProtokoll).Returns("HTTP1.0");
-            RequestContext.Setup(_ => _.MessageEndPoint).Returns("/messages/a");
-            RequestContext.Setup(_ => _.PayLoad).Returns("PostTest");
+            SetupMockRequestContext("POST", "HTTP1.0", "/messages/a", "PostTest");
 
             Program.MessageListMutex = new Mutex();
             Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
@@ -138,10 +133,7 @@ namespace NunitTests
         [Test]
         public void testEndPoint_PUT_200_validputrequest()
         {
-            RequestContext.Setup(_ => _.HTTPVerb).Returns("PUT");
-            RequestContext.Setup(_ => _.HttpProtokoll).Returns("HTTP1.0");
-            RequestContext.Setup(_ => _.MessageEndPoint).Returns("/messages/0");
-            RequestContext.Setup(_ => _.PayLoad).Returns("PUTTEST");
+            SetupMockRequestContext("PUT", "HTTP1.0", "/messages/0", "PUTTEST");
 
             Program.MessageListMutex = new Mutex();
             Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
@@ -151,9 +143,7 @@ namespace NunitTests
         [Test]
         public void testEndPoint_PUT_404_invalidendpointalphanumeric()
         {
-            RequestContext.Setup(_ => _.HTTPVerb).Returns("PUT");
-            RequestContext.Setup(_ => _.HttpProtokoll).Returns("HTTP1.0");
-            RequestContext.Setup(_ => _.MessageEndPoint).Returns("/messages/a");
+            SetupMockRequestContext("PUT", "HTTP1.0", "/messages/a", "PUTTEST");
 
             Program.MessageListMutex = new Mutex();
             Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
@@ -162,9 +152,7 @@ namespace NunitTests
         [Test]
         public void testEndPoint_PUT_404_messagedoesnotexist()
         {
-            RequestContext.Setup(_ => _.HTTPVerb).Returns("PUT");
-            RequestContext.Setup(_ => _.HttpProtokoll).Returns("HTTP1.0");
-            RequestContext.Setup(_ => _.MessageEndPoint).Returns("/messages/5");
+            SetupMockRequestContext("PUT", "HTTP1.0", "/messages/5", "PUTTEST");
 
             Program.MessageListMutex = new Mutex();
             Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
@@ -173,10 +161,8 @@ namespace NunitTests
         [Test]
         public void testEndPoint_Delete_404_invalidendpoint()
         {
-            RequestContext.Setup(_ => _.HTTPVerb).Returns("DELETE");
-            RequestContext.Setup(_ => _.HttpProtokoll).Returns("HTTP1.0");
-            RequestContext.Setup(_ => _.MessageEndPoint).Returns("/messages");
-
+            SetupMockRequestContext("DELETE", "HTTP1.0", "/messages");
+   
             Program.MessageListMutex = new Mutex();
             Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
             Assert.AreEqual("404", status);
@@ -184,9 +170,7 @@ namespace NunitTests
         [Test]
         public void testEndPoint_Delete_404_doesnotexist()
         {
-            RequestContext.Setup(_ => _.HTTPVerb).Returns("DELETE");
-            RequestContext.Setup(_ => _.HttpProtokoll).Returns("HTTP1.0");
-            RequestContext.Setup(_ => _.MessageEndPoint).Returns("/messages/5");
+            SetupMockRequestContext("DELETE", "HTTP1.0", "/messages/5");
 
             Program.MessageListMutex = new Mutex();
             Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
@@ -195,9 +179,7 @@ namespace NunitTests
         [Test]
         public void testEndPoint_Delete_404_successfuldelete()
         {
-            RequestContext.Setup(_ => _.HTTPVerb).Returns("DELETE");
-            RequestContext.Setup(_ => _.HttpProtokoll).Returns("HTTP1.0");
-            RequestContext.Setup(_ => _.MessageEndPoint).Returns("/messages/0");
+            SetupMockRequestContext("DELETE", "HTTP1.0", "/messages/0");
 
             Program.MessageListMutex = new Mutex();
             Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
@@ -206,9 +188,7 @@ namespace NunitTests
         [Test]
         public void testEndPoint_unknownhttpverb_501()
         {
-            RequestContext.Setup(_ => _.HTTPVerb).Returns("Hans");
-            RequestContext.Setup(_ => _.HttpProtokoll).Returns("HTTP1.0");
-            RequestContext.Setup(_ => _.MessageEndPoint).Returns("/messages/0");
+            SetupMockRequestContext("Hans", "HTTP1.0", "/messages/0");
 
             Program.MessageListMutex = new Mutex();
             Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
@@ -222,7 +202,7 @@ namespace NunitTests
             string teststring = "GET /messages HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
             Array.Copy(System.Text.Encoding.ASCII.GetBytes(teststring), temparray, teststring.Length);
                
-            MyFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(temparray,0,x,0,teststring.Length); return teststring.Length; });
+            MyFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(temparray,0,x,0,teststring.Length); return teststring.Length; });            
             MyFakeStream.Setup(_ => _.DataAvailable).Returns(false);
             
             RequestContext ContextTest = new RequestContext(Tcpclient.Object,MyFakeStream.Object);

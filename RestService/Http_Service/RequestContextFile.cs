@@ -122,14 +122,16 @@ namespace Restservice.Http_Service
                         continue;
                     }
                     Headers.Add(SplitBuffer[0], SplitBuffer[1].Trim(' '));
+                    // host: 127.0.1.2\r\n
                 }
                 else
                 {
-                    PayLoad += SubString + '\n';
+                    PayLoad += SubString + "\r\n";
                     continue;
                 }
             }
             PayLoad = PayLoad.Trim('\n');
+            PayLoad = PayLoad.Trim('\r');
             return true;
         }
         public void printdictionary()
