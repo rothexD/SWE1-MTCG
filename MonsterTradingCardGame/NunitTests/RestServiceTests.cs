@@ -20,27 +20,40 @@ namespace NunitTests
         public Mock<FakeNetworkStreamInterface> Networkstream;
         public Mock<TcpClient> Tcpclient;
         public string status;
+        public int revokestatuscode;
         public string message;
-        public int counter;
+        public EndPointApi<RequestContextInterface, int> EndPointController;
         public Dictionary<int, string> MessageList;
-
+        public Mutex MessageListMutex;
+        public int Messagecounter;
+        public RegisteredEndpoints EndpointCreator;
+        public MessageStorageApi Storage;
         [SetUp]
         public void Construct2()
         {
-            HTTPresponsewrapper = new Mock<HTTPResponseWrapperInterface>();
+            MessageList = new Dictionary<int, string>();
             Networkstream = new Mock<FakeNetworkStreamInterface>();
             Tcpclient = new Mock<TcpClient>();
             RequestContext = new Mock<RequestContextInterface>();
+            HTTPresponsewrapper = new Mock<HTTPResponseWrapperInterface>();
+            MessageListMutex = new Mutex();         
 
-            HTTPresponsewrapper.Setup(_ => _.SendDefaultStatus(It.IsAny<FakeNetworkStreamInterface>(), It.IsAny<string>())).Returns(true).Callback((FakeNetworkStreamInterface x, string y) => { status = y; });
-            HTTPresponsewrapper.Setup(_ => _.SendDefaultMessage(It.IsAny<FakeNetworkStreamInterface>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true).Callback((FakeNetworkStreamInterface x, string y, string z) => { status = y; message = z; });
+            HTTPresponsewrapper.Setup(_ => _.SendDefaultStatus(It.IsAny<string>())).Returns(true).Callback((string y) => { status = y; });
+            HTTPresponsewrapper.Setup(_ => _.SendDefaultMessage(It.IsAny<string>(), It.IsAny<string>())).Returns(true).Callback((string y, string z) => { status = y; message = z; });
+               
+            RequestContext.Setup(_ => _.Stream).Returns(Networkstream.Object);
+            RequestContext.Setup(_ => _.ReponseHandler).Returns(HTTPresponsewrapper.Object);
             RequestContext.Setup(_ => _.ResolveEndPointToStringArray()).Returns(() => { return RequestContext.Object.MessageEndPoint.Split('/'); });
             status = "";
-            message = "";       
-            MessageList = new Dictionary<int, string>();
+            message = "";
             MessageList.Add(0, "test");
             MessageList.Add(1, "abc");
-            counter = MessageList.Count;
+
+            Messagecounter = MessageList.Count;
+            Storage = new MessageStorageApi(ref MessageList, ref Messagecounter, ref MessageListMutex);
+            EndpointCreator = new RegisteredEndpoints(ref Storage);
+            EndPointController = new EndPointApi<RequestContextInterface, int>();
+            EndpointCreator.ChainRegisterEndpoints(ref EndPointController);
         }
         private void SetupMockRequestContext(string verb, string protkoll, string endpoint)
         {
@@ -59,10 +72,9 @@ namespace NunitTests
         public void testEndPoint_get_200_normalrequest()
         {
             SetupMockRequestContext("GET", "HTTP1.0", "/messages");  
-        
-            Program.MessageListMutex = new Mutex();
-            Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
-            Assert.AreEqual("200", status);
+                 
+            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(200, revokestatuscode);
         }
 
         [Test]
@@ -70,74 +82,67 @@ namespace NunitTests
         {
             SetupMockRequestContext("GET", "HTTP1.0", "");
 
-            Program.MessageListMutex = new Mutex();
-            Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
-            Assert.AreEqual("404", status);
+            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(-2, revokestatuscode);
         }
         [Test]
         public void testEndPoint_get_404_noleadingslash()
         {
             SetupMockRequestContext("GET", "HTTP1.0", "messages");
 
-            Program.MessageListMutex = new Mutex();
-            Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
-            Assert.AreEqual("404", status);
+            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(-2, revokestatuscode);
         }
         [Test]
         public void testEndPoint_get_200_normalrequesttospecificendpoint()
         {
             SetupMockRequestContext("GET", "HTTP1.0", "/messages/0");
             
-            Program.MessageListMutex = new Mutex();
-            Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
-            Assert.AreEqual("200", status);
+            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(200, revokestatuscode);
         }
         [Test]
         public void testEndPoint_get_404_messagedoesnotexist()
         {
             SetupMockRequestContext("GET", "HTTP1.0", "/messages/3");
 
-            Program.MessageListMutex = new Mutex();
-            Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
-            Assert.AreEqual("404", status);
+            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(404, revokestatuscode);
         }
         [Test]
         public void testEndPoint_Post_404_posttoinvalidendpoint()
         {
             SetupMockRequestContext("POST", "HTTP1.0", "/messages/3");
 
-            Program.MessageListMutex = new Mutex();
-            Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
-            Assert.AreEqual("404", status);
+            revokestatuscode =EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(-3, revokestatuscode);
         }
         [Test]
         public void testEndPoint_Post_201_postcreated()
         {
             SetupMockRequestContext("POST", "HTTP1.0", "/messages", "PostTest");
 
-            Program.MessageListMutex = new Mutex();
-            Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
+            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
             Assert.AreEqual("201", status);
             Assert.AreEqual("PostTest", MessageList[2]);
-            Assert.AreEqual("2", message);
+            Assert.AreEqual(201, revokestatuscode);
         }
         [Test]
         public void testEndPoint_Post_404_invalidendpointalphanumeric()
         {
             SetupMockRequestContext("POST", "HTTP1.0", "/messages/a", "PostTest");
 
-            Program.MessageListMutex = new Mutex();
-            Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
-            Assert.AreEqual("404", status);
+            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(-2, revokestatuscode);
         }
         [Test]
         public void testEndPoint_PUT_200_validputrequest()
         {
             SetupMockRequestContext("PUT", "HTTP1.0", "/messages/0", "PUTTEST");
 
-            Program.MessageListMutex = new Mutex();
-            Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
-            Assert.AreEqual("200", status);
+ 
+            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(200, revokestatuscode);
             Assert.AreEqual("PUTTEST", MessageList[0]);
         }
         [Test]
@@ -145,54 +150,48 @@ namespace NunitTests
         {
             SetupMockRequestContext("PUT", "HTTP1.0", "/messages/a", "PUTTEST");
 
-            Program.MessageListMutex = new Mutex();
-            Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
-            Assert.AreEqual("400", status);
+            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(-2, revokestatuscode);
         }
         [Test]
         public void testEndPoint_PUT_404_messagedoesnotexist()
         {
             SetupMockRequestContext("PUT", "HTTP1.0", "/messages/5", "PUTTEST");
 
-            Program.MessageListMutex = new Mutex();
-            Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
-            Assert.AreEqual("404", status);
+            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(404, revokestatuscode);
         }
         [Test]
         public void testEndPoint_Delete_404_invalidendpoint()
         {
             SetupMockRequestContext("DELETE", "HTTP1.0", "/messages");
-   
-            Program.MessageListMutex = new Mutex();
-            Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
-            Assert.AreEqual("404", status);
+
+            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(-3, revokestatuscode);
         }
         [Test]
         public void testEndPoint_Delete_404_doesnotexist()
         {
             SetupMockRequestContext("DELETE", "HTTP1.0", "/messages/5");
 
-            Program.MessageListMutex = new Mutex();
-            Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
-            Assert.AreEqual("404", status);
+            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(404, revokestatuscode);
         }
         [Test]
         public void testEndPoint_Delete_404_successfuldelete()
         {
             SetupMockRequestContext("DELETE", "HTTP1.0", "/messages/0");
 
-            Program.MessageListMutex = new Mutex();
-            Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
-            Assert.AreEqual("200", status);
+            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(200, revokestatuscode);
         }
         [Test]
         public void testEndPoint_unknownhttpverb_501()
         {
             SetupMockRequestContext("Hans", "HTTP1.0", "/messages/0");
 
-            Program.MessageListMutex = new Mutex();
-            Program.endpointMessage(HTTPresponsewrapper.Object, RequestContext.Object, ref MessageList, ref counter);
-            Assert.AreEqual("501", status);
+            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(-3, revokestatuscode);
         }
         [Test]
         public void testParse()

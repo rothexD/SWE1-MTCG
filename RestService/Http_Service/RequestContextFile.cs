@@ -20,6 +20,8 @@ namespace Restservice.Http_Service
         public string PayLoad { get;}
         public TcpClient Client { get;}
         public FakeNetworkStreamInterface Stream { get;}
+        
+        public HTTPResponseWrapperInterface ReponseHandler { get; }
     }
     public class RequestContext : RequestContextInterface
     {
@@ -31,10 +33,12 @@ namespace Restservice.Http_Service
         public string PayLoad { get; private set; }
         public TcpClient Client { get; private set; }
         public FakeNetworkStreamInterface Stream { get; private set; }
+        public HTTPResponseWrapperInterface ReponseHandler { get; private set; }
         public RequestContext(TcpClient Client, FakeNetworkStreamInterface Stream)
         {
             this.Client = Client;
             this.Stream = Stream;
+            ReponseHandler = new HTTPResponseWrapper(Stream);
             Headers = new Dictionary<string, string>();
             HTTPVerb = "";
             HttpProtokoll = "";

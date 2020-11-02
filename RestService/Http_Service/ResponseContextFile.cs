@@ -10,18 +10,21 @@ namespace Restservice.Http_Service
     public interface HTTPResponseWrapperInterface
     {
         public void ResetContext();
-        public bool SendResponseByTcp(FakeNetworkStreamInterface Stream , string StatusCode);
-        public bool SendMessageByTcp(FakeNetworkStreamInterface Stream, string StatusCode, string Message);
-        public bool SendDefaultStatus(FakeNetworkStreamInterface Stream, string StatusCode);
-        public bool SendDefaultMessage(FakeNetworkStreamInterface Stream, string StatusCode, string Message);
+        public bool SendResponseByTcp(string StatusCode);
+        public bool SendMessageByTcp(string StatusCode, string Message);
+        public bool SendDefaultStatus(string StatusCode);
+        public bool SendDefaultMessage(string StatusCode, string Message);
+        public FakeNetworkStreamInterface Stream { get; }
     }
     public class HTTPResponseWrapper : HTTPResponseWrapperInterface
     {
         public Dictionary<string, string> DicionaryHeaders { get; set; }
+        public FakeNetworkStreamInterface Stream { get; private set; }
 
-        public HTTPResponseWrapper()
+        public HTTPResponseWrapper(FakeNetworkStreamInterface Stream)
         {
             DicionaryHeaders = new Dictionary<string, string>();
+            this.Stream = Stream;
             ResetContext();
         }
         public void ResetContext()
@@ -40,7 +43,7 @@ namespace Restservice.Http_Service
                 default: return "Unknown StatusCode";
             }
         }
-        public bool SendResponseByTcp(FakeNetworkStreamInterface Stream, string StatusCode)
+        public bool SendResponseByTcp(string StatusCode)
         {
             if (StatusCode == "")
             {
@@ -55,7 +58,7 @@ namespace Restservice.Http_Service
             Stream.Write(msg, 0, msg.Length);
             return true;
         }
-        public bool SendMessageByTcp(FakeNetworkStreamInterface Stream, string StatusCode, string Message)
+        public bool SendMessageByTcp(string StatusCode, string Message)
         {
             if (StatusCode == "")
             {
@@ -71,7 +74,7 @@ namespace Restservice.Http_Service
             Stream.Write(msg, 0, msg.Length);
             return true;
         }
-        public bool SendDefaultStatus(FakeNetworkStreamInterface Stream, string StatusCode)
+        public bool SendDefaultStatus(string StatusCode)
         {
             if (StatusCode == "")
             {
@@ -82,7 +85,7 @@ namespace Restservice.Http_Service
             Stream.Write(msg, 0, msg.Length);
             return true;
         }
-        public bool SendDefaultMessage(FakeNetworkStreamInterface Stream, string StatusCode, string Message)
+        public bool SendDefaultMessage(string StatusCode, string Message)
         {
             if (StatusCode == "")
             {

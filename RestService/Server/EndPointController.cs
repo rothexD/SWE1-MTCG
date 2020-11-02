@@ -6,39 +6,28 @@ using Restservice.Http_Service;
 
 namespace Restservice.Server
 {
-    public class ResponseContext
+    public class EndPointApi<TCallFunctionBy,TReturnValue>
     {
-        public string HttpStatusCode;
-        public string payload;
+        public Dictionary<string, Dictionary<string, Func<TCallFunctionBy, TReturnValue>>> Endpoints { get; protected set; }
 
-        public ResponseContext(string status, string payload)
+        public EndPointApi()
         {
-            this.HttpStatusCode = status;
-            this.payload = payload;
-        }
-    }
-    class EndPointController<TCallFunctionBy,TReturnValue>
-    {
-        public Dictionary<string,Dictionary<string,Func<TCallFunctionBy, TReturnValue>>> _Endpoints;
-
-        EndPointController()
-        {
-            _Endpoints = new Dictionary<string, Dictionary<string, Func<TCallFunctionBy, TReturnValue>>>();
+            Endpoints = new Dictionary<string, Dictionary<string, Func<TCallFunctionBy, TReturnValue>>>();
         }
         public void RegisterEndPoint(string verb, string endpoint, Func<TCallFunctionBy, TReturnValue> callbackfunction)
         {
-            if (!_Endpoints.ContainsKey(endpoint))
+            if (!Endpoints.ContainsKey(endpoint))
             {
-                _Endpoints[endpoint] = new Dictionary<string, Func<TCallFunctionBy, TReturnValue>>();
+                Endpoints[endpoint] = new Dictionary<string, Func<TCallFunctionBy, TReturnValue>>();
             }
-            _Endpoints[endpoint][verb] = callbackfunction;
+            Endpoints[endpoint][verb] = callbackfunction;
         }
-        public bool InvokeEndPoint(string verb,string EndPointInRegexForm,TCallFunctionBy CallfunctionByThisType)
+        public int InvokeEndPoint(string verb,string EndPointInRegexForm,TCallFunctionBy CallfunctionByThisType)
         {
             string location = null;
-            foreach(var item in _Endpoints)
+            foreach(var item in Endpoints)
             {
-                if (Regex.Match(item.Key, EndPointInRegexForm).Success)
+                if (Regex.Match(EndPointInRegexForm,"^" +item.Key+"$").Success)
                 {
                     location = item.Key;
                     break;
@@ -46,14 +35,24 @@ namespace Restservice.Server
             }
             if (location == null)
             {
-                return false;
+                return -2;
             }
-            if (_Endpoints[location].ContainsKey(verb))
+            if (Endpoints[location].ContainsKey(verb))
             {
-                _Endpoints[location][verb].Invoke(CallfunctionByThisType);
-                return true;
+                return ToInt(Endpoints[location][verb].Invoke(CallfunctionByThisType));
             }
-            return false;
+            return -3;
+        }
+        private int ToInt(TReturnValue x)
+        {
+            try
+            {
+                return Convert.ToInt32(x);
+            }
+            catch
+            {
+                return -1;
+            }
         }
 
     }
