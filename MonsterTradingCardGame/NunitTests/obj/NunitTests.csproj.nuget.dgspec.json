@@ -82,8 +82,8 @@
               "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\MonsterTradingCardGame\\MonsterTradingCardGame\\MCTG.csproj": {
                 "projectPath": "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\MonsterTradingCardGame\\MonsterTradingCardGame\\MCTG.csproj"
               },
-              "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\Restservice\\Restservice.csproj": {
-                "projectPath": "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\Restservice\\Restservice.csproj"
+              "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\MonsterTradingCardGame\\RestService\\Restservice.csproj": {
+                "projectPath": "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\MonsterTradingCardGame\\RestService\\Restservice.csproj"
               }
             }
           }
@@ -133,14 +133,14 @@
         }
       }
     },
-    "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\Restservice\\Restservice.csproj": {
+    "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\MonsterTradingCardGame\\RestService\\Restservice.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\Restservice\\Restservice.csproj",
+        "projectUniqueName": "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\MonsterTradingCardGame\\RestService\\Restservice.csproj",
         "projectName": "Restservice",
-        "projectPath": "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\Restservice\\Restservice.csproj",
+        "projectPath": "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\MonsterTradingCardGame\\RestService\\Restservice.csproj",
         "packagesPath": "C:\\Users\\rothexD\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\Restservice\\obj\\",
+        "outputPath": "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\MonsterTradingCardGame\\RestService\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\rothexD\\AppData\\Roaming\\NuGet\\NuGet.Config",

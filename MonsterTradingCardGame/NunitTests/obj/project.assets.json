@@ -4832,8 +4832,8 @@
     },
     "Restservice/1.0.0": {
       "type": "project",
-      "path": "../../Restservice/Restservice.csproj",
-      "msbuildProject": "../../Restservice/Restservice.csproj"
+      "path": "../RestService/Restservice.csproj",
+      "msbuildProject": "../RestService/Restservice.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -4875,8 +4875,8 @@
             "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\MonsterTradingCardGame\\MonsterTradingCardGame\\MCTG.csproj": {
               "projectPath": "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\MonsterTradingCardGame\\MonsterTradingCardGame\\MCTG.csproj"
             },
-            "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\Restservice\\Restservice.csproj": {
-              "projectPath": "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\Restservice\\Restservice.csproj"
+            "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\MonsterTradingCardGame\\RestService\\Restservice.csproj": {
+              "projectPath": "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\MonsterTradingCardGame\\RestService\\Restservice.csproj"
             }
           }
         }

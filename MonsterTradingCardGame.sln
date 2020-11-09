@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCTG", "MonsterTradingCardG
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NunitTests", "MonsterTradingCardGame\NunitTests\NunitTests.csproj", "{01079818-52BC-4551-A6D5-EDE75790577C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Restservice", "Restservice\Restservice.csproj", "{8A916B74-9308-4CBF-A3B6-1D7398769A9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Restservice", "MonsterTradingCardGame\RestService\Restservice.csproj", "{B171F523-CBD0-406D-AC4D-2455C69934DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{01079818-52BC-4551-A6D5-EDE75790577C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01079818-52BC-4551-A6D5-EDE75790577C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01079818-52BC-4551-A6D5-EDE75790577C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8A916B74-9308-4CBF-A3B6-1D7398769A9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8A916B74-9308-4CBF-A3B6-1D7398769A9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8A916B74-9308-4CBF-A3B6-1D7398769A9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8A916B74-9308-4CBF-A3B6-1D7398769A9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B171F523-CBD0-406D-AC4D-2455C69934DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B171F523-CBD0-406D-AC4D-2455C69934DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B171F523-CBD0-406D-AC4D-2455C69934DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B171F523-CBD0-406D-AC4D-2455C69934DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

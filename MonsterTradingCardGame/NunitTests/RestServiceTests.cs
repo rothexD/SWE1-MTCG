@@ -46,8 +46,7 @@ namespace NunitTests
             Tcpclient.Setup(_ => _.Close());
 
             RequestContext.Setup(_ => _.Stream).Returns(Networkstream.Object);
-            RequestContext.Setup(_ => _.ReponseHandler).Returns(HTTPresponsewrapper.Object);
-            RequestContext.Setup(_ => _.ResolveEndPointToStringArray()).Returns(() => { return RequestContext.Object.MessageEndPoint.Split('/'); });
+            RequestContext.Setup(_ => _.ReponseHandler).Returns(HTTPresponsewrapper.Object);            
             Status = "";
             Mesage = "";
             MessageList.Add(0, "test");
