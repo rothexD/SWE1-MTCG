@@ -7,21 +7,21 @@ using System.Net.Sockets;
 using Restservice.Server;
 namespace Restservice.Http_Service
 {
-    public interface HTTPResponseWrapperInterface
+    public interface IHTTPResponseWrapper
     {
         public void ResetContext();
         public bool SendResponseByTcp(string StatusCode);
         public bool SendMessageByTcp(string StatusCode, string Message);
         public bool SendDefaultStatus(string StatusCode);
         public bool SendDefaultMessage(string StatusCode, string Message);
-        public FakeNetworkStreamInterface Stream { get; }
+        public IMyNetWorkStream Stream { get; }
     }
-    public class HTTPResponseWrapper : HTTPResponseWrapperInterface
+    public class HTTPResponseWrapper : IHTTPResponseWrapper
     {
         public Dictionary<string, string> DicionaryHeaders { get; set; }
-        public FakeNetworkStreamInterface Stream { get; private set; }
+        public IMyNetWorkStream Stream { get; private set; }
 
-        public HTTPResponseWrapper(FakeNetworkStreamInterface Stream)
+        public HTTPResponseWrapper(IMyNetWorkStream Stream)
         {
             DicionaryHeaders = new Dictionary<string, string>();
             this.Stream = Stream;
@@ -31,9 +31,9 @@ namespace Restservice.Http_Service
         {
             DicionaryHeaders.Clear();
         }
-        private string ResolveHTTPStatuscode(string StatusCode)
+        private string ResolveHTTPStatuscode(string statusCode)
         {
-            switch (StatusCode)
+            switch (statusCode)
             {
                 case ("200"): return "OK";
                 case ("400"): return "Bad Request";
@@ -43,57 +43,87 @@ namespace Restservice.Http_Service
                 default: return "Unknown StatusCode";
             }
         }
-        public bool SendResponseByTcp(string StatusCode)
+        public bool SendResponseByTcp(string statusCode)
         {
-            if (StatusCode == "")
+            if (statusCode == "")
             {
                 return false;
             }
-            string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\r\n";
+            string response = $"HTTP/1.1 {statusCode} {ResolveHTTPStatuscode(statusCode)}\r\n";
+
             foreach (var item in DicionaryHeaders)
             {
-                Response += $"{item.Key}: {item.Value}\r\n";
+                response += $"{item.Key}: {item.Value}\r\n";
             }
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(Response);
-            Stream.Write(msg, 0, msg.Length);
-            return true;
-        }
-        public bool SendMessageByTcp(string StatusCode, string Message)
-        {
-            if (StatusCode == "")
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(response);
+            try
+            {
+                Stream.Write(msg, 0, msg.Length);
+            }
+            catch
             {
                 return false;
             }
-            string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\r\n";
+            return true;
+        }
+        public bool SendMessageByTcp(string statusCode, string message)
+        {
+            if (statusCode == "")
+            {
+                return false;
+            }
+            string response = $"HTTP/1.1 {statusCode} {ResolveHTTPStatuscode(statusCode)}\r\n";
             foreach (var item in DicionaryHeaders)
             {
-                Response += $"{item.Key}: {item.Value}\r\n";
+                response += $"{item.Key}: {item.Value}\r\n";
             }
-            Response += $"Content-Length: {Message.Length}\r\n\r\n{Message}";
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(Response);
-            Stream.Write(msg, 0, msg.Length);
-            return true;
-        }
-        public bool SendDefaultStatus(string StatusCode)
-        {
-            if (StatusCode == "")
+            response += $"Content-Length: {message.Length}\r\n\r\n{message}";
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(response);
+            try
+            {
+                Stream.Write(msg, 0, msg.Length);
+            }
+            catch
             {
                 return false;
             }
-            string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\r\nCache-Control: no-cache\nDate: {DateTime.Now}\r\nConnection: Closed";
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(Response);
-            Stream.Write(msg, 0, msg.Length);
+            
             return true;
         }
-        public bool SendDefaultMessage(string StatusCode, string Message)
+        public bool SendDefaultStatus(string statusCode)
         {
-            if (StatusCode == "")
+            if (statusCode == "")
             {
                 return false;
             }
-            string Response = $"HTTP/1.1 {StatusCode} {ResolveHTTPStatuscode(StatusCode)}\r\nCache-Control: no-cache\r\nDate: {DateTime.Now}\r\nConnection: Closed\r\nContent-Type: raw\r\nContent-Length: {Message.Length}\r\n\r\n{Message}";
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(Response);
-            Stream.Write(msg, 0, msg.Length);
+            string response = $"HTTP/1.1 {statusCode} {ResolveHTTPStatuscode(statusCode)}\r\nCache-Control: no-cache\nDate: {DateTime.Now}\r\nConnection: Closed";
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(response);
+            try
+            {
+                Stream.Write(msg, 0, msg.Length);
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+        public bool SendDefaultMessage(string statusCode, string message)
+        {
+            if (statusCode == "")
+            {
+                return false;
+            }
+            string response = $"HTTP/1.1 {statusCode} {ResolveHTTPStatuscode(statusCode)}\r\nCache-Control: no-cache\r\nDate: {DateTime.Now}\r\nConnection: Closed\r\nContent-Type: raw\r\nContent-Length: {message.Length}\r\n\r\n{message}";
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(response);
+            try
+            {
+                Stream.Write(msg, 0, msg.Length);
+            }
+            catch
+            {
+                return false;
+            }
             return true;
         }
     }

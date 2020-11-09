@@ -22,11 +22,11 @@ namespace Restservice.Server
             MessageCounter = 0;
             MessageListMutex = new Mutex();
         }
-        public MessageStorageApi(ref Dictionary<int, string> MessageList, ref int Messagecounter, ref Mutex MessageListMutex)
+        public MessageStorageApi(ref Dictionary<int, string> messageList, ref int messageCounter, ref Mutex messageListMutex)
         {
-            this.MessageList = MessageList;
-            this.MessageCounter = Messagecounter;
-            this.MessageListMutex = new Mutex();
+            this.MessageList = messageList;
+            this.MessageCounter = messageCounter;
+            this.MessageListMutex = messageListMutex;
         }
     }
 }

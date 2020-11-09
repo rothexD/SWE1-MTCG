@@ -7,7 +7,7 @@ using System.Net.Sockets;
 using Restservice.Http_Service;
 namespace Restservice.Server
 {
-    public interface FakeNetworkStreamInterface
+    public interface IMyNetWorkStream
     {
 
         int Read(byte[] buffer, int offset, int size);
@@ -15,31 +15,31 @@ namespace Restservice.Server
         void Write(byte[] buffer, int offset, int size);
 
     }
-    public class MyNetworkStream : FakeNetworkStreamInterface
+    public class MyNetWorkStream : IMyNetWorkStream
     {
-        private NetworkStream stream;
+        private NetworkStream _stream;
 
-        public MyNetworkStream(NetworkStream ns)
+        public MyNetWorkStream(NetworkStream ns)
         {
             if (ns == null) throw new ArgumentNullException("ns");
-            this.stream = ns;
+            this._stream = ns;
         }
 
         public bool DataAvailable
         {
             get
             {
-                return this.stream.DataAvailable;
+                return this._stream.DataAvailable;
             }
         }
 
         public int Read(byte[] buffer, int offset, int size)
         {
-            return this.stream.Read(buffer, offset, size);
+            return this._stream.Read(buffer, offset, size);
         }
         public void Write(byte[] buffer, int offset, int size)
         {
-            this.stream.Write(buffer, offset, size);
+            this._stream.Write(buffer, offset, size);
         }
     }
 

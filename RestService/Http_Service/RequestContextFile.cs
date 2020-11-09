@@ -7,10 +7,10 @@ using System.Net.Sockets;
 using Restservice.Server;
 namespace Restservice.Http_Service
 {
-    public interface RequestContextInterface
+    public interface IRequestContext
     {
         public string[] ResolveEndPointToStringArray();
-        public string SearchInDictionaryByKey(string FindThisKey);
+        public bool GetFromDictionaryByKey(string FindThisKey, out string ReturnVal);
         public bool Parse();
         public void printdictionary();
         public string HTTPVerb { get; }
@@ -18,12 +18,12 @@ namespace Restservice.Http_Service
         public string MessageEndPoint { get;}
         public Dictionary<string, string> Headers { get;}
         public string PayLoad { get;}
-        public TcpClient Client { get;}
-        public FakeNetworkStreamInterface Stream { get;}
+        public IMyTcpClient Client { get;}
+        public IMyNetWorkStream Stream { get;}
         
-        public HTTPResponseWrapperInterface ReponseHandler { get; }
+        public IHTTPResponseWrapper ReponseHandler { get; }
     }
-    public class RequestContext : RequestContextInterface
+    public class RequestContext : IRequestContext
     {
         //https://stackoverflow.com/questions/21312870/how-to-access-private-variables-using-get-set
         public string HTTPVerb { get; private set; }
@@ -31,13 +31,13 @@ namespace Restservice.Http_Service
         public string MessageEndPoint { get; private set; }
         public Dictionary<string, string> Headers { get; private set; }
         public string PayLoad { get; private set; }
-        public TcpClient Client { get; private set; }
-        public FakeNetworkStreamInterface Stream { get; private set; }
-        public HTTPResponseWrapperInterface ReponseHandler { get; private set; }
-        public RequestContext(TcpClient Client, FakeNetworkStreamInterface Stream)
+        public IMyTcpClient Client { get; private set; }
+        public IMyNetWorkStream Stream { get; private set; }
+        public IHTTPResponseWrapper ReponseHandler { get; private set; }
+        public RequestContext(IMyTcpClient Client)
         {
             this.Client = Client;
-            this.Stream = Stream;
+            this.Stream = Client.GetStream();
             ReponseHandler = new HTTPResponseWrapper(Stream);
             Headers = new Dictionary<string, string>();
             HTTPVerb = "";
@@ -59,30 +59,30 @@ namespace Restservice.Http_Service
             Headers.Clear();
             PayLoad = "";
         }
-        public string SearchInDictionaryByKey(string FindThisKey)
+        public bool GetFromDictionaryByKey(string FindThisKey,out string ReturnVal)
         {
-            //https://stackoverflow.com/questions/5531042/how-to-find-item-in-dictionary-collection
-            string Output = "";
-            if (Headers.TryGetValue(FindThisKey, out Output))
+            //https://stackoverflow.com/questions/5531042/how-to-find-item-in-dictionary-collection           
+            if (Headers.TryGetValue(FindThisKey, out ReturnVal))
             {
-                return Output;
+                return true;
             }
             else
             {
-                return null;
+                ReturnVal = "";
+                return false;
             }
         }
         public bool Parse()
         {
             ResetContext();
-            Byte[] bytes = new Byte[2000];
-            String data = "";
-            string[] SplitByEndline = null;
-            string[] SplitBuffer = null;
+            byte[] bytes = new byte[2000];
+            string data = "";
+            string[] splitByEndline = null;
+            string[] splitBuffer = null;
             bool RecievingHTTPMessage = false;
 
             int i = 0;
-            int counter = 0;
+
             while ((i = Stream.Read(bytes, 0, bytes.Length)) != 0)
             {
                 data += System.Text.Encoding.ASCII.GetString(bytes, 0, i);
@@ -91,46 +91,49 @@ namespace Restservice.Http_Service
                     break;
                 }
             }
-            SplitByEndline = data.Split('\n');
-            for(i=0;i<SplitByEndline.Length;i++)
+
+
+            splitByEndline = data.Split('\n');
+            for(i=0;i<splitByEndline.Length;i++)
             {
-                SplitByEndline[i] = SplitByEndline[i].Trim('\r');
+                splitByEndline[i] = splitByEndline[i].Trim('\r');
             }
-            SplitBuffer = SplitByEndline[0].Split(' ');
-            if (SplitBuffer.Length < 3)
+            splitBuffer = splitByEndline[0].Split(' ');
+            if (splitBuffer.Length < 3)
             {
                 return false;
             }
-            HTTPVerb = SplitBuffer[0];
-            MessageEndPoint = SplitBuffer[1];
-            HttpProtokoll = SplitBuffer[2];
-            SplitByEndline[0] = "\n\n\n\0";
-            foreach (string SubString in SplitByEndline)
+            HTTPVerb = splitBuffer[0];
+            MessageEndPoint = splitBuffer[1];
+            HttpProtokoll = splitBuffer[2];
+            splitByEndline[0] = "\n\n\n\0";
+
+            foreach (string subString in splitByEndline)
             {
-                if (SubString == "\n\n\n\0")
+                if (subString == "\n\n\n\0")
                 {
                     continue;
                 }
                 if (!RecievingHTTPMessage)
                 {
-                    if (SubString.Length == 0)
+                    if (subString.Length == 0)
                     {
                         RecievingHTTPMessage = true;
                         continue;
                     }
                     //https://stackoverflow.com/questions/21519548/split-string-based-on-the-first-occurrence-of-the-character
-                    SplitBuffer = SubString.Split(new[] { ':' }, 2);
-                    if (SplitBuffer.Length == 1)
+                    splitBuffer = subString.Split(new[] { ':' }, 2);
+                    if (splitBuffer.Length == 1)
                     {
                         RecievingHTTPMessage = true;
                         continue;
                     }
-                    Headers.Add(SplitBuffer[0], SplitBuffer[1].Trim(' '));
+                    Headers.Add(splitBuffer[0], splitBuffer[1].Trim(' '));
                     // host: 127.0.1.2\r\n
                 }
                 else
                 {
-                    PayLoad += SubString + "\r\n";
+                    PayLoad += subString + "\r\n";
                     continue;
                 }
             }

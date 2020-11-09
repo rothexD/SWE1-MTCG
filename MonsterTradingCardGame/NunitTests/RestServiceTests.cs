@@ -15,45 +15,50 @@ namespace NunitTests
 {
     class RestServiceTests
     {
-        public Mock<HTTPResponseWrapperInterface> HTTPresponsewrapper;
-        public Mock<RequestContextInterface> RequestContext;
-        public Mock<FakeNetworkStreamInterface> Networkstream;
-        public Mock<TcpClient> Tcpclient;
-        public string status;
-        public int revokestatuscode;
-        public string message;
-        public EndPointApi<RequestContextInterface, int> EndPointController;
+        public Mock<IHTTPResponseWrapper> HTTPresponsewrapper;
+        public Mock<IRequestContext> RequestContext;
+        public Mock<IMyNetWorkStream> Networkstream;
+        public Mock<IMyTcpClient> Tcpclient;
+        public string Status;
+        public int RevokeStatusCode;
+        public string Mesage;
         public Dictionary<int, string> MessageList;
         public Mutex MessageListMutex;
         public int Messagecounter;
-        public RegisteredEndpoints EndpointCreator;
+        public RegisterEndPointsAndManageData EndpointCreator;
         public MessageStorageApi Storage;
+        public ServerTcpListener Server;
+
         [SetUp]
         public void Construct2()
         {
             MessageList = new Dictionary<int, string>();
-            Networkstream = new Mock<FakeNetworkStreamInterface>();
-            Tcpclient = new Mock<TcpClient>();
-            RequestContext = new Mock<RequestContextInterface>();
-            HTTPresponsewrapper = new Mock<HTTPResponseWrapperInterface>();
+            Networkstream = new Mock<IMyNetWorkStream>();
+            Tcpclient = new Mock<IMyTcpClient>();
+            RequestContext = new Mock<IRequestContext>();
+            HTTPresponsewrapper = new Mock<IHTTPResponseWrapper>();
             MessageListMutex = new Mutex();         
 
-            HTTPresponsewrapper.Setup(_ => _.SendDefaultStatus(It.IsAny<string>())).Returns(true).Callback((string y) => { status = y; });
-            HTTPresponsewrapper.Setup(_ => _.SendDefaultMessage(It.IsAny<string>(), It.IsAny<string>())).Returns(true).Callback((string y, string z) => { status = y; message = z; });
-               
+            HTTPresponsewrapper.Setup(_ => _.SendDefaultStatus(It.IsAny<string>())).Returns(true).Callback((string y) => { Status = y; });
+            HTTPresponsewrapper.Setup(_ => _.SendDefaultMessage(It.IsAny<string>(), It.IsAny<string>())).Returns(true).Callback((string y, string z) => { Status = y; Mesage = z; });
+            
+            Tcpclient.Setup(_ => _.GetStream()).Returns(Networkstream.Object);
+            Tcpclient.Setup(_ => _.Close());
+
             RequestContext.Setup(_ => _.Stream).Returns(Networkstream.Object);
             RequestContext.Setup(_ => _.ReponseHandler).Returns(HTTPresponsewrapper.Object);
             RequestContext.Setup(_ => _.ResolveEndPointToStringArray()).Returns(() => { return RequestContext.Object.MessageEndPoint.Split('/'); });
-            status = "";
-            message = "";
+            Status = "";
+            Mesage = "";
             MessageList.Add(0, "test");
             MessageList.Add(1, "abc");
 
             Messagecounter = MessageList.Count;
             Storage = new MessageStorageApi(ref MessageList, ref Messagecounter, ref MessageListMutex);
-            EndpointCreator = new RegisteredEndpoints(ref Storage);
-            EndPointController = new EndPointApi<RequestContextInterface, int>();
-            EndpointCreator.ChainRegisterEndpoints(ref EndPointController);
+            EndpointCreator = new RegisterEndPointsAndManageData(ref Storage);
+            Server = new ServerTcpListener();
+
+            EndpointCreator.ChainRegisterEndpoints(ref Server);
         }
         private void SetupMockRequestContext(string verb, string protkoll, string endpoint)
         {
@@ -68,13 +73,14 @@ namespace NunitTests
             RequestContext.Setup(_ => _.MessageEndPoint).Returns(endpoint);
             RequestContext.Setup(_ => _.PayLoad).Returns(payload);
         }
+    
         [Test]
         public void testEndPoint_get_200_normalrequest()
         {
             SetupMockRequestContext("GET", "HTTP1.0", "/messages");  
                  
-            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(200, revokestatuscode);
+            RevokeStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(200, RevokeStatusCode);
         }
 
         [Test]
@@ -82,58 +88,54 @@ namespace NunitTests
         {
             SetupMockRequestContext("GET", "HTTP1.0", "");
 
-            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(-2, revokestatuscode);
+            Assert.AreEqual("NotAValidEndpoint", Assert.Throws<Exception>(() => Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object)).Message);
         }
         [Test]
         public void testEndPoint_get_404_noleadingslash()
         {
             SetupMockRequestContext("GET", "HTTP1.0", "messages");
 
-            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(-2, revokestatuscode);
+            Assert.AreEqual("NotAValidEndpoint", Assert.Throws<Exception>(() => Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object)).Message);
         }
         [Test]
         public void testEndPoint_get_200_normalrequesttospecificendpoint()
         {
             SetupMockRequestContext("GET", "HTTP1.0", "/messages/0");
             
-            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(200, revokestatuscode);
+            RevokeStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(200, RevokeStatusCode);
         }
         [Test]
         public void testEndPoint_get_404_messagedoesnotexist()
         {
             SetupMockRequestContext("GET", "HTTP1.0", "/messages/3");
 
-            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(404, revokestatuscode);
+            RevokeStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(404, RevokeStatusCode);
         }
         [Test]
         public void testEndPoint_Post_404_posttoinvalidendpoint()
         {
             SetupMockRequestContext("POST", "HTTP1.0", "/messages/3");
 
-            revokestatuscode =EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(-3, revokestatuscode);
+            Assert.AreEqual("NotAValidVerbForEndpoint", Assert.Throws<Exception>(() => Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object)).Message);
         }
         [Test]
         public void testEndPoint_Post_201_postcreated()
         {
             SetupMockRequestContext("POST", "HTTP1.0", "/messages", "PostTest");
 
-            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual("201", status);
+            RevokeStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual("201", Status);
             Assert.AreEqual("PostTest", MessageList[2]);
-            Assert.AreEqual(201, revokestatuscode);
+            Assert.AreEqual(201, RevokeStatusCode);
         }
         [Test]
         public void testEndPoint_Post_404_invalidendpointalphanumeric()
         {
             SetupMockRequestContext("POST", "HTTP1.0", "/messages/a", "PostTest");
 
-            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(-2, revokestatuscode);
+            Assert.AreEqual("NotAValidEndpoint", Assert.Throws<Exception>(() => Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object)).Message);
         }
         [Test]
         public void testEndPoint_PUT_200_validputrequest()
@@ -141,8 +143,8 @@ namespace NunitTests
             SetupMockRequestContext("PUT", "HTTP1.0", "/messages/0", "PUTTEST");
 
  
-            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(200, revokestatuscode);
+            RevokeStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(200, RevokeStatusCode);
             Assert.AreEqual("PUTTEST", MessageList[0]);
         }
         [Test]
@@ -150,64 +152,63 @@ namespace NunitTests
         {
             SetupMockRequestContext("PUT", "HTTP1.0", "/messages/a", "PUTTEST");
 
-            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(-2, revokestatuscode);
+            Assert.AreEqual("NotAValidEndpoint", Assert.Throws<Exception>(() => Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object)).Message);
         }
         [Test]
         public void testEndPoint_PUT_404_messagedoesnotexist()
         {
             SetupMockRequestContext("PUT", "HTTP1.0", "/messages/5", "PUTTEST");
 
-            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(404, revokestatuscode);
+            RevokeStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(404, RevokeStatusCode);
         }
         [Test]
         public void testEndPoint_Delete_404_invalidendpoint()
         {
             SetupMockRequestContext("DELETE", "HTTP1.0", "/messages");
 
-            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(-3, revokestatuscode);
+            Assert.AreEqual("NotAValidVerbForEndpoint", Assert.Throws<Exception>(() => Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object)).Message);
         }
         [Test]
         public void testEndPoint_Delete_404_doesnotexist()
         {
             SetupMockRequestContext("DELETE", "HTTP1.0", "/messages/5");
 
-            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(404, revokestatuscode);
+            RevokeStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(404, RevokeStatusCode);
         }
         [Test]
         public void testEndPoint_Delete_404_successfuldelete()
         {
             SetupMockRequestContext("DELETE", "HTTP1.0", "/messages/0");
 
-            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(200, revokestatuscode);
+            RevokeStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(200, RevokeStatusCode);
         }
         [Test]
         public void testEndPoint_unknownhttpverb_501()
         {
             SetupMockRequestContext("Hans", "HTTP1.0", "/messages/0");
 
-            revokestatuscode = EndPointController.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(-3, revokestatuscode);
+            Assert.AreEqual("NotAValidVerbForEndpoint", Assert.Throws<Exception>(() => Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object)).Message);
         }
         [Test]
         public void testParse()
         {
-            Mock<FakeNetworkStreamInterface> MyFakeStream = new Mock<FakeNetworkStreamInterface>();
-            Byte[] temparray = new byte[2000];
-            string teststring = "GET /messages HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
-            Array.Copy(System.Text.Encoding.ASCII.GetBytes(teststring), temparray, teststring.Length);
+            Mock<IMyNetWorkStream> myFakeStream = new Mock<IMyNetWorkStream>();
+            byte[] tempArray = new byte[2000];
+            string testString = "GET /messages HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
+            Array.Copy(System.Text.Encoding.ASCII.GetBytes(testString), tempArray, testString.Length);
                
-            MyFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(temparray,0,x,0,teststring.Length); return teststring.Length; });            
-            MyFakeStream.Setup(_ => _.DataAvailable).Returns(false);
-            
-            RequestContext ContextTest = new RequestContext(Tcpclient.Object,MyFakeStream.Object);
+            myFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(tempArray,0,x,0,testString.Length); return testString.Length; });            
+            myFakeStream.Setup(_ => _.DataAvailable).Returns(false);
+            Tcpclient.Setup(_ => _.GetStream()).Returns(myFakeStream.Object);
+
+            RequestContext ContextTest = new RequestContext(Tcpclient.Object);
             ContextTest.Parse();
-            string Key1 = ContextTest.SearchInDictionaryByKey("Host");
-            string Key2 = ContextTest.SearchInDictionaryByKey("Test");
+
+            ContextTest.GetFromDictionaryByKey("Host", out string Key1);
+            ContextTest.GetFromDictionaryByKey("Test", out string Key2);
 
             Assert.AreEqual("GET", ContextTest.HTTPVerb);
             Assert.AreEqual("/messages", ContextTest.MessageEndPoint);
@@ -215,6 +216,129 @@ namespace NunitTests
             Assert.AreEqual("PayloadTest", ContextTest.PayLoad);
             Assert.AreEqual("127.0.0.1", Key1);
             Assert.AreEqual("Test", Key2);          
+        }
+        [Test]
+        public void testParse_nullexception()
+        {
+            Mock<IMyNetWorkStream> myFakeStream = new Mock<IMyNetWorkStream>();
+            byte[] tempArray = new byte[2000];
+            string testString = "GET /messages HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
+            Array.Copy(System.Text.Encoding.ASCII.GetBytes(testString), tempArray, testString.Length);
+
+            myFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(tempArray, 0, x, 0, testString.Length); return testString.Length; });
+            myFakeStream.Setup(_ => _.DataAvailable).Returns(false);
+            Tcpclient.Setup(_ => _.GetStream()).Returns(myFakeStream.Object);
+
+            RequestContext ContextTest = new RequestContext(Tcpclient.Object);
+            ContextTest.Parse();
+
+            Assert.Throws<ArgumentNullException>(() => ContextTest.GetFromDictionaryByKey(null, out string Key1));
+        }
+        [Test]
+        public void TestProcessConnection_nullref()
+        {
+            bool returnVal = Server.ProcessConnection(null);
+
+            Assert.AreEqual(false, returnVal);           
+        }
+        [Test]
+        public void TestProcessConnection_validrequest()
+        {        
+            Mock<IMyNetWorkStream> myFakeStream = new Mock<IMyNetWorkStream>();
+            byte[] tempArray = new byte[2000];
+            string testString = "GET /messages HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
+            Array.Copy(System.Text.Encoding.ASCII.GetBytes(testString), tempArray, testString.Length);
+
+            myFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(tempArray, 0, x, 0, testString.Length); return testString.Length; });
+            myFakeStream.Setup(_ => _.DataAvailable).Returns(false);
+            Tcpclient.Setup(_ => _.GetStream()).Returns(myFakeStream.Object);
+
+            bool returnVal = Server.ProcessConnection(Tcpclient.Object);
+
+            Assert.AreEqual(true, returnVal);
+        }
+        [Test]
+        public void TestProcessConnection_unknownverb()
+        {
+            Mock<IMyNetWorkStream> myFakeStream = new Mock<IMyNetWorkStream>();
+            byte[] tempArray = new byte[2000];
+            string teststring = "HANS /messages HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
+            Array.Copy(System.Text.Encoding.ASCII.GetBytes(teststring), tempArray, teststring.Length);
+
+            myFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(tempArray, 0, x, 0, teststring.Length); return teststring.Length; });
+            myFakeStream.Setup(_ => _.DataAvailable).Returns(false);
+            Tcpclient.Setup(_ => _.GetStream()).Returns(myFakeStream.Object);
+
+            bool returnval = Server.ProcessConnection(Tcpclient.Object);
+
+            Assert.AreEqual(false, returnval);
+        }
+        [Test]
+        public void TestProcessConnection_unknownendpoint()
+        {
+            Mock<IMyNetWorkStream> myFakeStream = new Mock<IMyNetWorkStream>();
+            byte[] tempArray = new byte[2000];
+            string testString = "GET /messag HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
+            Array.Copy(System.Text.Encoding.ASCII.GetBytes(testString), tempArray, testString.Length);
+
+            myFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(tempArray, 0, x, 0, testString.Length); return testString.Length; });
+            myFakeStream.Setup(_ => _.DataAvailable).Returns(false);
+            Tcpclient.Setup(_ => _.GetStream()).Returns(myFakeStream.Object);
+
+            bool returnVal = Server.ProcessConnection(Tcpclient.Object);
+
+            Assert.AreEqual(false, returnVal);
+        }
+        [Test]
+        public void TestProcessConnection_socketexception()
+        {
+            Mock<IMyNetWorkStream> MyFakeStream = new Mock<IMyNetWorkStream>();
+            byte[] tempArray = new byte[2000];
+            string testString = "GET /message HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
+            Array.Copy(System.Text.Encoding.ASCII.GetBytes(testString), tempArray, testString.Length);
+
+            MyFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(tempArray, 0, x, 0, testString.Length); return testString.Length; });
+            MyFakeStream.Setup(_ => _.DataAvailable).Returns(false);
+            MyFakeStream.Setup(_ => _.Write(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Throws(new SocketException(1));
+            Tcpclient.Setup(_ => _.GetStream()).Returns(MyFakeStream.Object);
+
+            bool returnVal = Server.ProcessConnection(Tcpclient.Object);
+
+            Assert.AreEqual(false, returnVal);
+        }
+        [Test]
+        public void TestProcessConnection_argumentnullexcpetion()
+        {
+            Mock<IMyNetWorkStream> myFakeStream = new Mock<IMyNetWorkStream>();
+            byte[] tempArray = new byte[2000];
+            string testString = "GET /message HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
+            Array.Copy(System.Text.Encoding.ASCII.GetBytes(testString), tempArray, testString.Length);
+
+            myFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(tempArray, 0, x, 0, testString.Length); return testString.Length; });
+            myFakeStream.Setup(_ => _.DataAvailable).Returns(false);
+            myFakeStream.Setup(_ => _.Write(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Throws(new ArgumentNullException());
+            Tcpclient.Setup(_ => _.GetStream()).Returns(myFakeStream.Object);
+
+            bool returnVal = Server.ProcessConnection(Tcpclient.Object);
+
+            Assert.AreEqual(false, returnVal);
+        }
+        [Test]
+        public void TestHTTPRequest_FindKey()
+        {
+            Mock<IMyNetWorkStream> myFakeStream = new Mock<IMyNetWorkStream>();
+            byte[] tempArray = new byte[2000];
+            string teststring = "GET /messages HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
+            Array.Copy(System.Text.Encoding.ASCII.GetBytes(teststring), tempArray, teststring.Length);
+
+            myFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(tempArray, 0, x, 0, teststring.Length); return teststring.Length; });
+            myFakeStream.Setup(_ => _.DataAvailable).Returns(false);
+            Tcpclient.Setup(_ => _.GetStream()).Returns(myFakeStream.Object);
+
+            RequestContext contextTest = new RequestContext(Tcpclient.Object);
+            contextTest.Parse();
+
+            Assert.Throws<ArgumentNullException>(() => contextTest.GetFromDictionaryByKey(null, out string Key1));
         }
     }
 }
