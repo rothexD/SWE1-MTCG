@@ -9,7 +9,6 @@ namespace Restservice.Http_Service
 {
     public interface IRequestContext
     {
-        public bool GetFromDictionaryByKey(string FindThisKey, out string ReturnVal);
         public bool Parse();
         public void printdictionary();
         public string HTTPVerb { get; }
@@ -54,23 +53,11 @@ namespace Restservice.Http_Service
             Headers.Clear();
             PayLoad = "";
         }
-        public bool GetFromDictionaryByKey(string FindThisKey,out string ReturnVal)
-        {
-            //https://stackoverflow.com/questions/5531042/how-to-find-item-in-dictionary-collection           
-            if (Headers.TryGetValue(FindThisKey, out ReturnVal))
-            {
-                return true;
-            }
-            else
-            {
-                ReturnVal = "";
-                return false;
-            }
-        }
+
         public bool Parse()
         {
             ResetContext();
-            byte[] bytes = new byte[2000];
+            byte[] bytes = new byte[2048];
             string data = "";
             string[] splitByEndline = null;
             string[] splitBuffer = null;
