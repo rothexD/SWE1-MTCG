@@ -69,7 +69,7 @@ namespace NunitTests
 
             int Stacksize = User.Stack.Count;
 
-            Assert.IsTrue(User.AddToStack(Ork));
+            Assert.IsTrue(User.AddToStack(Ork, out _));
             Assert.AreEqual(Stacksize+1, User.Stack.Count);
         }
         [Test]
@@ -78,10 +78,10 @@ namespace NunitTests
             Player User = new Player("Lukas", 0, 0, 0, 20, 100);
             int Stacksize;
 
-            User.AddToStack(Ork);
+            User.AddToStack(Ork, out string temp);
             Stacksize = User.Stack.Count;
 
-            Assert.IsFalse(User.AddToStack(Ork));
+            Assert.IsFalse(User.AddToStack(Ork, out _));
             Assert.AreEqual(Stacksize, User.Stack.Count);
         }
         [Test]
@@ -89,11 +89,11 @@ namespace NunitTests
         {
             Player User = new Player("Lukas", 0, 0, 0, 20, 100);
 
-            User.AddToStack(Ork);
+            User.AddToStack(Ork, out string temp);
             int Stacksize = User.Stack.Count;
 
 
-            Assert.IsTrue(User.RemoveFromStack(Ork.CardId));
+            Assert.IsTrue(User.RemoveFromStack(Ork.CardId, out _));
             Assert.AreEqual(Stacksize-1, User.Stack.Count);
         }
         [Test]
@@ -104,7 +104,7 @@ namespace NunitTests
 
             Stacksize = User.Stack.Count;
 
-            Assert.IsFalse(User.RemoveFromStack(Ork.CardId));
+            Assert.IsFalse(User.RemoveFromStack(Ork.CardId, out _));
             Assert.AreEqual(Stacksize, User.Stack.Count);
         }
         [Test]
@@ -124,7 +124,7 @@ namespace NunitTests
             StackSize = User.Stack.Count;
             //--------------------------------------------------------------------
 
-            Assert.IsTrue(User.MoveFromDeckToStack(Ork.CardId));
+            Assert.IsTrue(User.MoveFromDeckToStack(Ork.CardId, out _));
             Assert.AreEqual(DeckSize-1, User.Deck.Count);
             Assert.AreEqual(StackSize+1, User.Stack.Count);
         }
@@ -144,7 +144,7 @@ namespace NunitTests
             DeckSize = User.Deck.Count;
             StackSize = User.Stack.Count;
             //--------------------------------------------------------------------
-            Assert.IsFalse(User.MoveFromDeckToStack(-1));
+            Assert.IsFalse(User.MoveFromDeckToStack(-1, out _));
             Assert.AreEqual(DeckSize, User.Deck.Count);
             Assert.AreEqual(StackSize, User.Stack.Count);
         }
@@ -165,7 +165,7 @@ namespace NunitTests
             DeckSize = User.Deck.Count;
             //--------------------------------------------------------------------------------
 
-            Assert.IsTrue(User.MoveFromStackToDeck(knight.CardId));
+            Assert.IsTrue(User.MoveFromStackToDeck(knight.CardId, out _));
             Assert.AreEqual(StackSize-1, User.Stack.Count);
             Assert.AreEqual(DeckSize+1, User.Deck.Count);
         }
@@ -190,7 +190,7 @@ namespace NunitTests
             DeckSize = User.Deck.Count;
             //--------------------------------------------------------------------------------
 
-            Assert.IsFalse(User.MoveFromStackToDeck(Wizzard.CardId));
+            Assert.IsFalse(User.MoveFromStackToDeck(Wizzard.CardId, out _));
             Assert.AreEqual(StackSize, User.Stack.Count);
             Assert.AreEqual(DeckSize, User.Deck.Count);
             Assert.AreEqual(5, User.Deck.Count);
@@ -215,7 +215,7 @@ namespace NunitTests
             StackSize = User.Stack.Count;
             DeckSize = User.Deck.Count;
             //--------------------------------------------------------------------------------
-            Assert.IsFalse(User.MoveFromStackToDeck(-1));
+            Assert.IsFalse(User.MoveFromStackToDeck(-1, out _));
             Assert.AreEqual(StackSize, User.Stack.Count);
             Assert.AreEqual(DeckSize, User.Deck.Count);
         }
@@ -232,7 +232,7 @@ namespace NunitTests
             Coins = User.Coins;
             DeckSize = User.Deck.Count;
 
-            Assert.IsTrue(User.UserAttemptsCardPurchase(Ork, 20));
+            Assert.IsTrue(User.UserAttemptsCardPurchase(Ork, 20, out _));
             Assert.AreEqual(StackSize + 1, User.Stack.Count);
             Assert.AreEqual(Coins-20, User.Coins);
             Assert.AreEqual(DeckSize, User.Deck.Count);
@@ -253,7 +253,7 @@ namespace NunitTests
             Coins = User.Coins;
             DeckSize = User.Deck.Count;
 
-            Assert.IsFalse(User.UserAttemptsCardPurchase(Ork, 20));
+            Assert.IsFalse(User.UserAttemptsCardPurchase(Ork, 20, out _));
             Assert.AreEqual(StackSize, User.Stack.Count);
             Assert.AreEqual(Coins, User.Coins);
             Assert.AreEqual(DeckSize, User.Deck.Count);
@@ -270,8 +270,7 @@ namespace NunitTests
             StackSize = User.Stack.Count;
             Coins = User.Coins;
             DeckSize = User.Deck.Count;
-
-            Assert.IsFalse(User.UserAttemptsCardPurchase(WaterSpell, 20));
+            Assert.IsFalse(User.UserAttemptsCardPurchase(WaterSpell, 20, out _));
             Assert.AreEqual(StackSize, User.Stack.Count);
             Assert.AreEqual(Coins, User.Coins);
             Assert.AreEqual(DeckSize, User.Deck.Count);

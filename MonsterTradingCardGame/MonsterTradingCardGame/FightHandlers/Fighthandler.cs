@@ -175,16 +175,16 @@ namespace MCTG.FightHandlers
                 Battlelog += $"-------------------------------------------------------------------{Environment.NewLine}";
                 Battlelog += "ITS A TIE";
                 MostRecentStatus = BattleStatus.Tie;
-                Player1.IncreaseTie();
-                Player2.IncreaseTie();
+                Player1.IncreaseTie(out _);
+                Player2.IncreaseTie(out _);
                 return true;
             }else if(Player1TempDeck.Count > Player2TempDeck.Count)
             {
                 Battlelog += $"-------------------------------------------------------------------{Environment.NewLine}";
                 Battlelog += $"Winner is {Player1.PlayerName}{Environment.NewLine}";
                 MostRecentStatus = BattleStatus.Player1Winner;
-                Player1.IncreaseWin();
-                Player2.IncreaseLose();
+                Player1.IncreaseWin(out _);
+                Player2.IncreaseLose(out _);
                 return true;
             }
             else
@@ -192,8 +192,8 @@ namespace MCTG.FightHandlers
                 Battlelog += $"-------------------------------------------------------------------{Environment.NewLine}";
                 Battlelog += $"Winner is {Player2.PlayerName}{Environment.NewLine}";
                 MostRecentStatus = BattleStatus.Player2Winner;
-                Player2.IncreaseWin();
-                Player1.IncreaseLose();
+                Player2.IncreaseWin(out _);
+                Player1.IncreaseLose(out _);
                 return true;
             }
         }

@@ -18,12 +18,12 @@ namespace WebserviceRest
         static void Main(string[] args)
         {
             Dictionary<int, string> messageList = new Dictionary<int, string>();
-            int messageCounter = 0;
+            int messageCounter = 1;
             Mutex messageListMutex = new Mutex();
         
-            messageList.Add(0, "Hallo");
+            messageList.Add(messageCounter, "Hallo");
             messageCounter++;
-            messageList.Add(1, "Test");
+            messageList.Add(messageCounter, "Test");
             messageCounter++;
 
             MessageStorageApi storage = new MessageStorageApi(ref messageList, ref messageCounter, ref messageListMutex);

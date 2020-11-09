@@ -125,11 +125,13 @@ namespace Restservice.Server
             {
 
                 httpRequest.ReponseHandler.SendDefaultStatus("404");
+                client.Close();
                 return false;
             }
             catch(Exception e) when (e.Message == "NotAValidVerbForEndpoint")
             {
                 httpRequest.ReponseHandler.SendDefaultStatus("501");
+                client.Close();
                 return false;
             }
             
