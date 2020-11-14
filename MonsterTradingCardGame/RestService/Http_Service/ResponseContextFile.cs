@@ -5,17 +5,11 @@ using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 using Restservice.Server;
+using Restservice.MockHelper;
+
 namespace Restservice.Http_Service
 {
-    public interface IHTTPResponseWrapper
-    {
-        public void ResetContext();
-        public bool SendResponseByTcp(string StatusCode);
-        public bool SendMessageByTcp(string StatusCode, string Message);
-        public bool SendDefaultStatus(string StatusCode);
-        public bool SendDefaultMessage(string StatusCode, string Message);
-        public IMyNetWorkStream Stream { get; }
-    }
+    
     public class HTTPResponseWrapper : IHTTPResponseWrapper
     {
         public Dictionary<string, string> DicionaryHeaders { get; set; }
@@ -77,6 +71,7 @@ namespace Restservice.Http_Service
             {
                 response += $"{item.Key}: {item.Value}\r\n";
             }
+            response += "\r\n";
             response += $"Content-Length: {message.Length}\r\n\r\n{message}";
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(response);
             try
@@ -96,7 +91,7 @@ namespace Restservice.Http_Service
             {
                 return false;
             }
-            string response = $"HTTP/1.1 {statusCode} {ResolveHTTPStatuscode(statusCode)}\r\nCache-Control: no-cache\nDate: {DateTime.Now}\r\nConnection: Closed";
+            string response = $"HTTP/1.1 {statusCode} {ResolveHTTPStatuscode(statusCode)}\r\nCache-Control: no-cache\nDate: {DateTime.Now}\r\nConnection: Closed\r\n\r\n";
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(response);
             try
             {

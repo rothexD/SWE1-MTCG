@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Moq;
 using NUnit.Framework;
-using WebserviceRest;
 using System.Threading;
-using System.Net;
 using System.Net.Sockets;
 using Restservice.Http_Service;
 using Restservice.Server;
-
+using Restservice.MockHelper;
 
 namespace NunitTests
 {
@@ -20,7 +17,7 @@ namespace NunitTests
         public Mock<IMyNetWorkStream> Networkstream;
         public Mock<IMyTcpClient> Tcpclient;
         public string Status;
-        public int RevokeStatusCode;
+        public int returnStatusCode;
         public string Mesage;
         public Dictionary<int, string> MessageList;
         public Mutex MessageListMutex;
@@ -78,8 +75,8 @@ namespace NunitTests
         {
             SetupMockRequestContext("GET", "HTTP1.0", "/messages");  
                  
-            RevokeStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(200, RevokeStatusCode);
+            returnStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(200, returnStatusCode);
         }
         [Test]
         public void testEndPoint_get_404_BadEndPoint()
@@ -107,8 +104,8 @@ namespace NunitTests
         {
             SetupMockRequestContext("GET", "HTTP1.0", "/messages/0");
             
-            RevokeStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(200, RevokeStatusCode);
+            returnStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(200, returnStatusCode);
         }
         [Test]
         public void testEndPoint_get_404_endpointregextest()
@@ -116,15 +113,15 @@ namespace NunitTests
             SetupMockRequestContext("GET", "HTTP1.0", "/messages/0/1");
 
             Assert.AreEqual("NotAValidEndpoint", Assert.Throws<Exception>(() => Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object)).Message);
-            Assert.AreEqual(200, RevokeStatusCode);
+            Assert.AreEqual(200, returnStatusCode);
         }
         [Test]
         public void testEndPoint_get_404_messagedoesnotexist()
         {
             SetupMockRequestContext("GET", "HTTP1.0", "/messages/3");
 
-            RevokeStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(404, RevokeStatusCode);
+            returnStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(404, returnStatusCode);
         }
         [Test]
         public void testEndPoint_Post_404_posttoinvalidendpoint1()
@@ -145,10 +142,10 @@ namespace NunitTests
         {
             SetupMockRequestContext("POST", "HTTP1.0", "/messages", "PostTest");
 
-            RevokeStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            returnStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
             Assert.AreEqual("201", Status);
             Assert.AreEqual("PostTest", MessageList[2]);
-            Assert.AreEqual(201, RevokeStatusCode);
+            Assert.AreEqual(201, returnStatusCode);
         }
         [Test]
         public void testEndPoint_Post_404_invalidendpointalphanumeric()
@@ -163,8 +160,8 @@ namespace NunitTests
             SetupMockRequestContext("PUT", "HTTP1.0", "/messages/0", "PUTTEST");
 
  
-            RevokeStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(200, RevokeStatusCode);
+            returnStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(200, returnStatusCode);
             Assert.AreEqual("PUTTEST", MessageList[0]);
         }
         [Test]
@@ -179,8 +176,8 @@ namespace NunitTests
         {
             SetupMockRequestContext("PUT", "HTTP1.0", "/messages/5", "PUTTEST");
 
-            RevokeStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(404, RevokeStatusCode);
+            returnStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(404, returnStatusCode);
         }
         [Test]
         public void testEndPoint_Delete_404_invalidendpoint()
@@ -194,16 +191,16 @@ namespace NunitTests
         {
             SetupMockRequestContext("DELETE", "HTTP1.0", "/messages/5");
 
-            RevokeStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(404, RevokeStatusCode);
+            returnStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(404, returnStatusCode);
         }
         [Test]
         public void testEndPoint_Delete_404_successfuldelete()
         {
             SetupMockRequestContext("DELETE", "HTTP1.0", "/messages/0");
 
-            RevokeStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
-            Assert.AreEqual(200, RevokeStatusCode);
+            returnStatusCode = Server.EndPointApi.InvokeEndPoint(RequestContext.Object.HTTPVerb, RequestContext.Object.MessageEndPoint, RequestContext.Object);
+            Assert.AreEqual(200, returnStatusCode);
         }
         [Test]
         public void testEndPoint_unknownhttpverb_501()
@@ -217,18 +214,23 @@ namespace NunitTests
         {
             Mock<IMyNetWorkStream> myFakeStream = new Mock<IMyNetWorkStream>();
             byte[] tempArray = new byte[2000];
-            string testString = "GET /messages HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
-            Array.Copy(System.Text.Encoding.ASCII.GetBytes(testString), tempArray, testString.Length);
-               
+            RequestContext ContextTest;
+            string testString;
+
+
+            testString = "GET /messages HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
+            Array.Copy(System.Text.Encoding.ASCII.GetBytes(testString), tempArray, testString.Length);   
+            
             myFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(tempArray,0,x,0,testString.Length); return testString.Length; });            
             myFakeStream.Setup(_ => _.DataAvailable).Returns(false);
             Tcpclient.Setup(_ => _.GetStream()).Returns(myFakeStream.Object);
 
-            RequestContext ContextTest = new RequestContext(Tcpclient.Object);
+            ContextTest = new RequestContext(Tcpclient.Object);
             ContextTest.Parse();
-
             ContextTest.Headers.TryGetValue("Host", out string Key1);
             ContextTest.Headers.TryGetValue("Test", out string Key2);
+
+
 
             Assert.AreEqual("GET", ContextTest.HTTPVerb);
             Assert.AreEqual("/messages", ContextTest.MessageEndPoint);
@@ -240,7 +242,9 @@ namespace NunitTests
         [Test]
         public void TestProcessConnection_nullref()
         {
-            bool returnVal = Server.ProcessConnection(null);
+            bool returnVal;
+
+            returnVal = Server.ProcessConnection(null);
 
             Assert.AreEqual(false, returnVal);           
         }
@@ -249,14 +253,18 @@ namespace NunitTests
         {        
             Mock<IMyNetWorkStream> myFakeStream = new Mock<IMyNetWorkStream>();
             byte[] tempArray = new byte[2000];
-            string testString = "GET /messages HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
-            Array.Copy(System.Text.Encoding.ASCII.GetBytes(testString), tempArray, testString.Length);
+            bool returnVal; 
+            string testString;
 
+
+            testString = "GET /messages HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
+            Array.Copy(System.Text.Encoding.ASCII.GetBytes(testString), tempArray, testString.Length);      
             myFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(tempArray, 0, x, 0, testString.Length); return testString.Length; });
-            myFakeStream.Setup(_ => _.DataAvailable).Returns(false);
+            myFakeStream.Setup(_ => _.DataAvailable).Returns(false);         
             Tcpclient.Setup(_ => _.GetStream()).Returns(myFakeStream.Object);
+            
+            returnVal = Server.ProcessConnection(Tcpclient.Object);
 
-            bool returnVal = Server.ProcessConnection(Tcpclient.Object);
 
             Assert.AreEqual(true, returnVal);
         }
@@ -265,14 +273,17 @@ namespace NunitTests
         {
             Mock<IMyNetWorkStream> myFakeStream = new Mock<IMyNetWorkStream>();
             byte[] tempArray = new byte[2000];
-            string teststring = "HANS /messages HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
-            Array.Copy(System.Text.Encoding.ASCII.GetBytes(teststring), tempArray, teststring.Length);
+            string teststring;
+            bool returnval;
 
+
+            teststring = "HANS /messages HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
+            Array.Copy(System.Text.Encoding.ASCII.GetBytes(teststring), tempArray, teststring.Length);
             myFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(tempArray, 0, x, 0, teststring.Length); return teststring.Length; });
             myFakeStream.Setup(_ => _.DataAvailable).Returns(false);
             Tcpclient.Setup(_ => _.GetStream()).Returns(myFakeStream.Object);
 
-            bool returnval = Server.ProcessConnection(Tcpclient.Object);
+            returnval = Server.ProcessConnection(Tcpclient.Object);
 
             Assert.AreEqual(false, returnval);
         }
@@ -281,14 +292,17 @@ namespace NunitTests
         {
             Mock<IMyNetWorkStream> myFakeStream = new Mock<IMyNetWorkStream>();
             byte[] tempArray = new byte[2048];
-            string testString = "GET /messag HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
-            Array.Copy(System.Text.Encoding.ASCII.GetBytes(testString), tempArray, testString.Length);
+            string testString;
+            bool returnVal;
 
+
+            testString = "GET /messag HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
+            Array.Copy(System.Text.Encoding.ASCII.GetBytes(testString), tempArray, testString.Length);
             myFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(tempArray, 0, x, 0, testString.Length); return testString.Length; });
             myFakeStream.Setup(_ => _.DataAvailable).Returns(false);
             Tcpclient.Setup(_ => _.GetStream()).Returns(myFakeStream.Object);
 
-            bool returnVal = Server.ProcessConnection(Tcpclient.Object);
+            returnVal = Server.ProcessConnection(Tcpclient.Object);
 
             Assert.AreEqual(false, returnVal);
         }
@@ -297,15 +311,18 @@ namespace NunitTests
         {
             Mock<IMyNetWorkStream> MyFakeStream = new Mock<IMyNetWorkStream>();
             byte[] tempArray = new byte[2048];
-            string testString = "GET /message HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
-            Array.Copy(System.Text.Encoding.ASCII.GetBytes(testString), tempArray, testString.Length);
+            string testString;
+            bool returnVal;
 
+            testString = "GET /message HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
+            
+            Array.Copy(System.Text.Encoding.ASCII.GetBytes(testString), tempArray, testString.Length);
             MyFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(tempArray, 0, x, 0, testString.Length); return testString.Length; });
             MyFakeStream.Setup(_ => _.DataAvailable).Returns(false);
             MyFakeStream.Setup(_ => _.Write(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Throws(new SocketException(1));
             Tcpclient.Setup(_ => _.GetStream()).Returns(MyFakeStream.Object);
 
-            bool returnVal = Server.ProcessConnection(Tcpclient.Object);
+            returnVal = Server.ProcessConnection(Tcpclient.Object);
 
             Assert.AreEqual(false, returnVal);
         }
@@ -314,7 +331,10 @@ namespace NunitTests
         {
             Mock<IMyNetWorkStream> myFakeStream = new Mock<IMyNetWorkStream>();
             byte[] tempArray = new byte[2048];
-            string testString = "GET /message HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
+            string testString;
+            bool returnVal;
+
+            testString = "GET /message HTTP/1.1\r\nHost:127.0.0.1\r\nTest:Test\r\n\r\nPayloadTest";
             Array.Copy(System.Text.Encoding.ASCII.GetBytes(testString), tempArray, testString.Length);
 
             myFakeStream.Setup(_ => _.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns((byte[] x, int y, int z) => { Array.Copy(tempArray, 0, x, 0, testString.Length); return testString.Length; });
@@ -322,7 +342,7 @@ namespace NunitTests
             myFakeStream.Setup(_ => _.Write(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Throws(new ArgumentNullException());
             Tcpclient.Setup(_ => _.GetStream()).Returns(myFakeStream.Object);
 
-            bool returnVal = Server.ProcessConnection(Tcpclient.Object);
+            returnVal = Server.ProcessConnection(Tcpclient.Object);
 
             Assert.AreEqual(false, returnVal);
         }

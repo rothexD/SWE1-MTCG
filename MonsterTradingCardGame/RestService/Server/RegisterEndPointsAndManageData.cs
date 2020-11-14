@@ -98,6 +98,7 @@ namespace Restservice.Server
                     if (Storage.MessageList.ContainsKey(messageIDFromHttpRequest))
                     {
                         Storage.MessageList.Remove(messageIDFromHttpRequest);
+                        Storage.MessageList = new Dictionary<int, string>(Storage.MessageList);
                         Storage.MessageListMutex.ReleaseMutex();
                         httpRequest.ReponseHandler.SendDefaultStatus("200");
                         return 200;

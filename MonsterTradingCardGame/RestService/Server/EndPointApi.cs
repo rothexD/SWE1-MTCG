@@ -8,7 +8,7 @@ namespace Restservice.Server
 {
     public class EndPointApi<TCallFunctionBy,TReturnValue> where TCallFunctionBy : notnull where TReturnValue : notnull
     {
-        public Dictionary<string, Dictionary<string, Func<TCallFunctionBy, TReturnValue>>> EndPoints { get; protected set; }
+        protected Dictionary<string, Dictionary<string, Func<TCallFunctionBy, TReturnValue>>> EndPoints { get; set; }
 
         public EndPointApi()
         {
