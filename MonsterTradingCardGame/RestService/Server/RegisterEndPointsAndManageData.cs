@@ -12,6 +12,7 @@ namespace Restservice.Server
 {
     public class RegisterEndPointsAndManageData
     {
+        //basic storage api, was created for mocking reasons and because the lambda scope was to complex to understand
         public MessageStorageApi Storage { get; set; }
         
         public RegisterEndPointsAndManageData(ref MessageStorageApi storage )
@@ -23,8 +24,10 @@ namespace Restservice.Server
             Storage = new MessageStorageApi();
         }
 
+        //registers endpoints
         public void ChainRegisterEndpoints(ref ServerTcpListener server)
         {
+            // registers basic get endpoint where all messages are shown
             server.EndPointApi.RegisterEndPoint("GET", "^/messages$", (IRequestContext httpRequest) =>
             {
                 string response = "";
@@ -44,6 +47,7 @@ namespace Restservice.Server
                 return 200;
             });
 
+            //registers endpoint where specific message is shown
             server.EndPointApi.RegisterEndPoint("GET", "^/messages/[0-9]+$", (IRequestContext httpRequest) =>
             {
 
@@ -77,6 +81,7 @@ namespace Restservice.Server
                 }
             });
 
+            //registers endpoint that allowes posting 
             server.EndPointApi.RegisterEndPoint("POST", "^/messages$", (IRequestContext httpRequest) =>
             {
                 Storage.MessageListMutex.WaitOne();
@@ -88,6 +93,7 @@ namespace Restservice.Server
                 return 201;
             });
 
+            //registers endpoint that deletes specific message
             server.EndPointApi.RegisterEndPoint("DELETE", "^/messages/[0-9]+$", (IRequestContext httpRequest) =>
             {
                 string[] endPointArray = httpRequest.MessageEndPoint.Split('/');
@@ -98,7 +104,10 @@ namespace Restservice.Server
                     if (Storage.MessageList.ContainsKey(messageIDFromHttpRequest))
                     {
                         Storage.MessageList.Remove(messageIDFromHttpRequest);
+
+                        //need to either sort or create a new Dictionary, issue: if u delete a message and post a new one it will no longer be in order
                         Storage.MessageList = new Dictionary<int, string>(Storage.MessageList);
+
                         Storage.MessageListMutex.ReleaseMutex();
                         httpRequest.ReponseHandler.SendDefaultStatus("200");
                         return 200;
@@ -118,6 +127,8 @@ namespace Restservice.Server
                     return 400;
                 }
             });
+
+            //update a specific message if it exists in message list
             server.EndPointApi.RegisterEndPoint("PUT", "^/messages/[0-9]+$", (IRequestContext httpRequest) =>
             {
                 string[] endPointArray = httpRequest.MessageEndPoint.Split('/');

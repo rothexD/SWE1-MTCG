@@ -31,7 +31,6 @@ namespace WebserviceRest
             ServerTcpListener server = new ServerTcpListener();
             endPointRegisterController.ChainRegisterEndpoints(ref server);
 
-            server.StartServer();
             server.ListenForConnections();
         }
     }

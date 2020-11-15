@@ -10,6 +10,7 @@ using System.Net;
 
 namespace Restservice.Server
 {
+    //basic storage api, was created for mocking reasons and because the lambda scope was to complex to understand
     public class MessageStorageApi
     {
         public Dictionary<int, string> MessageList { get; set; }
