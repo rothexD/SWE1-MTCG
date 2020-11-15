@@ -12,10 +12,9 @@ namespace Restservice.Http_Service
     public interface IHTTPResponseWrapper
     {
         public void ResetContext();
-        public bool SendResponseByTcp(string StatusCode);
-        public bool SendMessageByTcp(string StatusCode, string Message);
-        public bool SendDefaultStatus(string StatusCode);
-        public bool SendDefaultMessage(string StatusCode, string Message);
-        public IMyNetWorkStream Stream { get; }
+        public bool SendResponseByTcp(IMyNetWorkStream stream,string statusCode);
+        public bool SendMessageByTcp(IMyNetWorkStream stream,string statusCode, string message);
+        public bool SendDefaultStatus(IMyNetWorkStream Stream,string statusCode);
+        public bool SendDefaultMessage(IMyNetWorkStream stream,string statusCode, string message);
     }
 }

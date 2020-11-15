@@ -104,7 +104,6 @@ namespace Restservice.Server
                 }
                 else
                 {
-                    httpRequest.ReponseHandler.SendDefaultStatus("400");
                     client.Close();
                     return false;
                 }    
@@ -132,14 +131,14 @@ namespace Restservice.Server
             catch(Exception e) when (e.Message == "NotAValidEndpoint")
             {
                 // ResourceEndpoint was not found in Endpoint Api
-                httpRequest.ReponseHandler.SendDefaultStatus("404");
+                httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream,"404");
                 client.Close();
                 return false;
             }
             catch(Exception e) when (e.Message == "NotAValidVerbForEndpoint")
             {
                 // HTTP verb not registered for that resource endpoint
-                httpRequest.ReponseHandler.SendDefaultStatus("501");
+                httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream,"501");
                 client.Close();
                 return false;
             }

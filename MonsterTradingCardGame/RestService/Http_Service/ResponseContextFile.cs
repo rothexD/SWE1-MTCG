@@ -13,12 +13,10 @@ namespace Restservice.Http_Service
     public class HTTPResponseWrapper : IHTTPResponseWrapper
     {
         public Dictionary<string, string> DicionaryHeaders { get; set; }
-        public IMyNetWorkStream Stream { get; private set; }
 
-        public HTTPResponseWrapper(IMyNetWorkStream Stream)
+        public HTTPResponseWrapper()
         {
             DicionaryHeaders = new Dictionary<string, string>();
-            this.Stream = Stream;
             ResetContext();
         }
         public void ResetContext()
@@ -37,7 +35,7 @@ namespace Restservice.Http_Service
                 default: return "Unknown StatusCode";
             }
         }
-        public bool SendResponseByTcp(string statusCode)
+        public bool SendResponseByTcp(IMyNetWorkStream stream,string statusCode)
         {
             if (statusCode == "")
             {
@@ -52,7 +50,7 @@ namespace Restservice.Http_Service
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(response);
             try
             {
-                Stream.Write(msg, 0, msg.Length);
+                stream.Write(msg, 0, msg.Length);
             }
             catch
             {
@@ -60,7 +58,7 @@ namespace Restservice.Http_Service
             }
             return true;
         }
-        public bool SendMessageByTcp(string statusCode, string message)
+        public bool SendMessageByTcp(IMyNetWorkStream stream, string statusCode, string message)
         {
             if (statusCode == "")
             {
@@ -76,7 +74,7 @@ namespace Restservice.Http_Service
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(response);
             try
             {
-                Stream.Write(msg, 0, msg.Length);
+                stream.Write(msg, 0, msg.Length);
             }
             catch
             {
@@ -85,7 +83,7 @@ namespace Restservice.Http_Service
             
             return true;
         }
-        public bool SendDefaultStatus(string statusCode)
+        public bool SendDefaultStatus(IMyNetWorkStream stream,string statusCode)
         {
             if (statusCode == "")
             {
@@ -95,7 +93,7 @@ namespace Restservice.Http_Service
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(response);
             try
             {
-                Stream.Write(msg, 0, msg.Length);
+                stream.Write(msg, 0, msg.Length);
             }
             catch
             {
@@ -103,7 +101,7 @@ namespace Restservice.Http_Service
             }
             return true;
         }
-        public bool SendDefaultMessage(string statusCode, string message)
+        public bool SendDefaultMessage(IMyNetWorkStream stream,string statusCode, string message)
         {
             if (statusCode == "")
             {
@@ -113,7 +111,7 @@ namespace Restservice.Http_Service
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(response);
             try
             {
-                Stream.Write(msg, 0, msg.Length);
+                stream.Write(msg, 0, msg.Length);
             }
             catch
             {

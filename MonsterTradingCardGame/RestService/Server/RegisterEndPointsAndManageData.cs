@@ -40,7 +40,7 @@ namespace Restservice.Server
                 Storage.MessageListMutex.ReleaseMutex();
                 //respond with OK Message
 
-                if(!httpRequest.ReponseHandler.SendDefaultMessage("200", response))
+                if(!httpRequest.ReponseHandler.SendDefaultMessage(httpRequest.Stream,"200", response))
                 {
                     return -1;
                 }                          
@@ -62,21 +62,21 @@ namespace Restservice.Server
                         Storage.MessageListMutex.ReleaseMutex();
                         string Response = $"Message {messageIDFromHttpRequest}: {output}\n";
                         //respond with OK Message
-                        httpRequest.ReponseHandler.SendDefaultMessage("200", Response);
+                        httpRequest.ReponseHandler.SendDefaultMessage(httpRequest.Stream, "200", Response);
                         return 200;
                     }
                     else
                     {
                         Storage.MessageListMutex.ReleaseMutex();
                         //respond Message not found;
-                        httpRequest.ReponseHandler.SendDefaultStatus("404");
+                        httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "404");
                         return 404;
                     }
                 }
                 else
                 {
                     //respond with bad Formatting
-                    httpRequest.ReponseHandler.SendDefaultStatus("400");
+                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
                     return 400;
                 }
             });
@@ -89,7 +89,7 @@ namespace Restservice.Server
                 int tempMessageCounter = Storage.MessageCounter;
                 Storage.MessageCounter++;
                 Storage.MessageListMutex.ReleaseMutex();
-                httpRequest.ReponseHandler.SendDefaultMessage("201", tempMessageCounter.ToString());
+                httpRequest.ReponseHandler.SendDefaultMessage(httpRequest.Stream, "201", tempMessageCounter.ToString());
                 return 201;
             });
 
@@ -109,21 +109,21 @@ namespace Restservice.Server
                         Storage.MessageList = new Dictionary<int, string>(Storage.MessageList);
 
                         Storage.MessageListMutex.ReleaseMutex();
-                        httpRequest.ReponseHandler.SendDefaultStatus("200");
+                        httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "200");
                         return 200;
                     }
                     else
                     {
                         Storage.MessageListMutex.ReleaseMutex();
                         //respond with bad MessageEndPoint
-                        httpRequest.ReponseHandler.SendDefaultStatus("404");
+                        httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "404");
                         return 404;
                     }
                 }
                 else
                 {
                     //respond with bad Formatting
-                    httpRequest.ReponseHandler.SendDefaultStatus("400");
+                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
                     return 400;
                 }
             });
@@ -141,21 +141,21 @@ namespace Restservice.Server
                         Storage.MessageList[messageIDFromHttpRequest] = httpRequest.PayLoad;
                         Storage.MessageListMutex.ReleaseMutex();
                         //respond with ok
-                        httpRequest.ReponseHandler.SendDefaultStatus("200");
+                        httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "200");
                         return 200;
                     }
                     else
                     {
                         Storage.MessageListMutex.ReleaseMutex();
                         //respond with bad MessageEndPoint
-                        httpRequest.ReponseHandler.SendDefaultStatus("404");
+                        httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "404");
                         return 404;
                     }
                 }
                 else
                 {
                     //respond with bad Formatting
-                    httpRequest.ReponseHandler.SendDefaultStatus("400");
+                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
                     return 400;
                 }
             });

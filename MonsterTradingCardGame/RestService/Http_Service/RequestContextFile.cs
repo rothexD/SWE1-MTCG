@@ -24,7 +24,7 @@ namespace Restservice.Http_Service
         {
             this.Client = Client;
             this.Stream = Client.GetStream();
-            ReponseHandler = new HTTPResponseWrapper(Stream);
+            ReponseHandler = new HTTPResponseWrapper();
             Headers = new Dictionary<string, string>();
             HTTPVerb = "";
             HttpProtokoll = "";
