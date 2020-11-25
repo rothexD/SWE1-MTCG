@@ -35,6 +35,7 @@ namespace NunitTests
             RequestContext = new Mock<IRequestContext>();
             HTTPresponsewrapper = new Mock<IHTTPResponseWrapper>();
             MessageListMutex = new Mutex();
+
             HTTPresponsewrapper.Setup(_ => _.SendDefaultStatus(It.IsAny<IMyNetWorkStream>(),It.IsAny<string>())).Returns(true).Callback((IMyNetWorkStream stream, string y) => { Status = y; });
             HTTPresponsewrapper.Setup(_ => _.SendDefaultMessage(It.IsAny<IMyNetWorkStream>(),It.IsAny<string>(), It.IsAny<string>())).Returns(true).Callback((IMyNetWorkStream stream, string y, string z) => { Status = y; Mesage = z; });
             

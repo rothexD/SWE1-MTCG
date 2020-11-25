@@ -79,7 +79,7 @@ namespace Restservice.Http_Service
             splitBuffer = splitByEndline[0].Split(' ');
 
             //verify that  3 elements exist in first line
-            if (splitBuffer[0].Length < 3)
+            if (splitBuffer.Length != 3)
             {
                 return false;
             }
