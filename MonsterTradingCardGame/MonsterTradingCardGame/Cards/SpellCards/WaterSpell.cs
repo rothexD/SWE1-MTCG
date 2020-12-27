@@ -4,7 +4,7 @@ namespace MCTG.Cards.SpellCards
 {
     public class WaterSpell : Card
     {
-        public WaterSpell(int Basedamage, string Name, int CardId, CardelEmentEnum Element) : base(CardId)
+        public WaterSpell(int Basedamage, string Name, string CardId, CardelEmentEnum Element) : base(CardId)
         {
             this.BaseDamage = Basedamage;
             this.CardName = Name;

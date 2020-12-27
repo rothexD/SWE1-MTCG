@@ -4,7 +4,7 @@ namespace MCTG.Cards.MonsterCards
 {
     public class Goblin : Card
     {
-        public Goblin(int Basedamage, string Name, int CardId, CardelEmentEnum Element) : base(CardId)
+        public Goblin(int Basedamage, string Name, string CardId, CardelEmentEnum Element) : base(CardId)
         {
             this.BaseDamage = Basedamage;
             this.CardName = Name;

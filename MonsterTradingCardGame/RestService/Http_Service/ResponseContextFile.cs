@@ -32,6 +32,10 @@ namespace Restservice.Http_Service
                 case ("404"): return "Not Found";
                 case ("201"): return "Created";
                 case ("501"): return "Not Implemented";
+                case ("202"): return "Accepted";
+                case ("403"): return "Forbidden";
+                case ("500"): return "Internal Server Error";
+
                 default: return "Unknown StatusCode";
             }
         }
@@ -107,7 +111,7 @@ namespace Restservice.Http_Service
             {
                 return false;
             }
-            string response = $"HTTP/1.1 {statusCode} {ResolveHTTPStatuscode(statusCode)}\r\nCache-Control: no-cache\r\nDate: {DateTime.Now}\r\nConnection: Closed\r\nContent-Type: raw\r\nContent-Length: {message.Length}\r\n\r\n{message}";
+            string response = $"HTTP/1.1 {statusCode} {ResolveHTTPStatuscode(statusCode)}\r\nCache-Control: no-cache\r\nDate: {DateTime.Now}\r\nConnection: Closed\r\nContent-Type: application/json\r\nContent-Length: {message.Length}\r\n\r\n{message}";
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(response);
             try
             {

@@ -23,16 +23,16 @@ namespace NunitTests
         [OneTimeSetUp]
         public void Construct()
         {
-            Ork = new Ork(10, "hans", 1, Card.CardelEmentEnum.normal);
-            Wizzard = new Wizzard(10, "Test", 2, Card.CardelEmentEnum.fire);
-            WaterSpell = new WaterSpell(10, "spell", 3, Card.CardelEmentEnum.water);
-            Goblin = new Goblin(10, "hans", 4, Card.CardelEmentEnum.normal);
-            Dragon = new Dragon(10, "Test", 5, Card.CardelEmentEnum.fire);
-            knight = new Knight(10, "Test", 6, Card.CardelEmentEnum.fire);
-            NormalSpell = new NormalSpell(10, "spell", 7, Card.CardelEmentEnum.normal);
-            FireElve = new FireElve(10, "hans", 5, Card.CardelEmentEnum.normal);
-            FireSpell = new FireSpell(10, "spell", 2, Card.CardelEmentEnum.fire);
-            Kraken = new Kraken(10, "spell", 2, Card.CardelEmentEnum.fire);
+            Ork = new Ork(10, "hans", "1", Card.CardelEmentEnum.normal);
+            Wizzard = new Wizzard(10, "Test", "2", Card.CardelEmentEnum.fire);
+            WaterSpell = new WaterSpell(10, "spell", "3", Card.CardelEmentEnum.water);
+            Goblin = new Goblin(10, "hans", "4", Card.CardelEmentEnum.normal);
+            Dragon = new Dragon(10, "Test", "5", Card.CardelEmentEnum.fire);
+            knight = new Knight(10, "Test", "6", Card.CardelEmentEnum.fire);
+            NormalSpell = new NormalSpell(10, "spell", "7", Card.CardelEmentEnum.normal);
+            FireElve = new FireElve(10, "hans", "5", Card.CardelEmentEnum.normal);
+            FireSpell = new FireSpell(10, "spell", "2", Card.CardelEmentEnum.fire);
+            Kraken = new Kraken(10, "spell", "2", Card.CardelEmentEnum.fire);
         }
         [Test]
         public void TestOrkVsWizzard_0()

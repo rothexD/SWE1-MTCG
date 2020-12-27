@@ -1,0 +1,8 @@
+﻿namespace MCTG.JsonHelper
+{
+    public class JsonSessions
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+}
