@@ -1,0 +1,114 @@
+[
+  {
+    "Route":"/tradings/any",
+    "Verb":"DELETE",
+    "Headers":"token",
+    "Payload":"",
+    "Description":"Deletes a posted trading, replace any with tradingID in Route"
+  },
+  {
+    "Route":"/cards",
+    "Verb":"GET",
+    "Headers":"token",
+    "Payload":"",
+    "Description":"Gets all cards a user owns and status of location (stack or deck)"
+  },
+  {
+    "Route":"/deck",
+    "Verb":"GET",
+    "Headers":"token",
+    "Payload":"",
+    "Description":"Gets current configured Deck of user"
+  },
+  {
+    "Route":"/help",
+    "Verb":"GET",
+    "Headers":"",
+    "Payload":"",
+    "Description":"Returns json-listing of possible commands"
+  },
+  {
+    "Route":"/score",
+    "Verb":"GET",
+    "Headers":"",
+    "Payload":"",
+    "Description":"Returns current scoreboard sorted by highest elo"
+  },
+  {
+    "Route":"/stats",
+    "Verb":"GET",
+    "Headers":"token",
+    "Payload":"",
+    "Description":"Returns stats of user"
+  },
+  {
+    "Route":"/tradings",
+    "Verb":"GET",
+    "Headers":"",
+    "Payload":"",
+    "Description":"Returns all all possible trades"
+  },
+  {
+    "Route":"/users/any",
+    "Verb":"GET",
+    "Headers":"token",
+    "Payload":"",
+    "Description":"Returns profile data, replace any with username.. token and any must match"
+  },
+  {
+    "Route":"/battles",
+    "Verb":"POST",
+    "Headers":"token",
+    "Payload":"",
+    "Description":"Enque for a battle, wait for opponent to match, match even happens if client decides timeout"
+  },
+  {
+    "Route":"/transactions/packages",
+    "Verb":"POST",
+    "Headers":"token",
+    "Payload":"",
+    "Description":"Buy a package if user has enough coins"
+  },
+  {
+    "Route":"/sessions",
+    "Verb":"POST",
+    "Headers":"",
+    "Payload":"JsonObj;string:Username,string:Password",
+    "Description":"If successful returns a valid token to be used as authentication"
+  },
+  {
+    "Route":"/tradings/any",
+    "Verb":"POST",
+    "Headers":"token",
+    "Payload":"cardIDtobeTraded,jsonstring",
+    "Description":"Try to trade payload card with any, replace any with TradingID"
+  },
+  {
+    "Route":"/tradings",
+    "Verb":"POST",
+    "Headers":"token",
+    "Payload":"JsonObj,string:iD,string:CardToTrade,string:type,int:damage",
+    "Description":"Post a trade to the tradingslist"
+  },
+  {
+    "Route":"/users",
+    "Verb":"POST",
+    "Headers":"",
+    "Payload":"JsonObj;string:username,string:passwort",
+    "Description":"Try to register user"
+  },
+  {
+    "Route":"/deck",
+    "Verb":"PUT",
+    "Headers":"token",
+    "Payload":"JsonArr;string:cardID,string:cardID,string:cardID,string:cardID",
+    "Description":"Overwrite old Deck with new Deck of 4 cards"
+  },
+  {
+    "Route":"/users/any",
+    "Verb":"PUT",
+    "Headers":"token",
+    "Payload":"JsonObj;string:Name,string:Bio,string:Image",
+    "Description":"Update profile data"
+  }
+]

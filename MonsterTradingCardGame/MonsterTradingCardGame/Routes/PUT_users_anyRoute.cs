@@ -11,62 +11,70 @@ namespace MCTG.Routes
 {
     public static class PUT_users_anyRoute
     {
-        public static void registerRoute(ServerTcpListener server)
+        public static void RegisterRoute(ServerTcpListener server)
         {
             server.EndPointApi.RegisterEndPoint("PUT", "^/users/.+$", (IRequestContext httpRequest) =>
             {
-                httpRequest.Headers.TryGetValue("Authorization", out string token);
-                if (!Regex.IsMatch(token, "^Basic (.*)-mtcgToken$"))
+                try
                 {
-                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
-                    return 400;
-                }
-                string userToken = Regex.Match(token, "^Basic (.*)-mtcgToken$").Groups[1].Value;
-                if (!Regex.IsMatch(httpRequest.MessageEndPoint, $"^/users/{userToken}$"))
-                {
-                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "401");
-                    return 401;
-                }
-
-
-                string querystring = @$"select LoginName from users where LoginName='{userToken}'";
-                NpgsqlConnection conn = DbHelper.ConnectObj();
-                conn.Open();
-
-                using (NpgsqlCommand command = new NpgsqlCommand(querystring, conn))
-                {
-                    NpgsqlDataReader reader = command.ExecuteReader();
-                    if (reader.HasRows == false)
+                    httpRequest.Headers.TryGetValue("Authorization", out string token);
+                    if (!Regex.IsMatch(token, "^Basic (.*)-mtcgToken$"))
                     {
                         httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
-                        conn.Close();
                         return 400;
                     }
-                    reader.Read();
-                    string UserID = reader[0].ToString();
-                    reader.Close();
-
-                    var UpdateData = JsonConvert.DeserializeObject<JsonProfileData>(httpRequest.PayLoad);
-                    string query;
-                    try
+                    string userToken = Regex.Match(token, "^Basic (.*)-mtcgToken$").Groups[1].Value;
+                    if (!Regex.IsMatch(httpRequest.MessageEndPoint, $"^/users/{userToken}$"))
                     {
-                        query = DbHelper.querybuilder(UpdateData, UserID);
-                    }
-                    catch
-                    {
-                        httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
-                        conn.Close();
-                        return 400;
+                        httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "404");
+                        return 404;
                     }
 
-                    using (NpgsqlCommand UpdateProfileData = new NpgsqlCommand(query, conn))
+
+                    string querystring = @$"select LoginName from users where LoginName='{userToken}'";
+                    NpgsqlConnection conn = DbHelper.ConnectObj();
+                    conn.Open();
+
+                    using (NpgsqlCommand command = new NpgsqlCommand(querystring, conn))
                     {
-                        Console.WriteLine(query);
-                        UpdateProfileData.ExecuteNonQuery();
-                        httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "200");
-                        conn.Close();
-                        return 200;
+                        NpgsqlDataReader reader = command.ExecuteReader();
+                        if (reader.HasRows == false)
+                        {
+                            httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "404");
+                            conn.Close();
+                            return 404;
+                        }
+                        reader.Read();
+                        string UserID = reader[0].ToString();
+                        reader.Close();
+
+                        var UpdateData = JsonConvert.DeserializeObject<JsonProfileData>(httpRequest.PayLoad);
+                        string query;
+                        try
+                        {
+                            query = DbHelper.querybuilder(UpdateData, UserID);
+                        }
+                        catch
+                        {
+                            httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
+                            conn.Close();
+                            return 400;
+                        }
+
+                        using (NpgsqlCommand UpdateProfileData = new NpgsqlCommand(query, conn))
+                        {
+                            Console.WriteLine(query);
+                            UpdateProfileData.ExecuteNonQuery();
+                            httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "200");
+                            conn.Close();
+                            return 200;
+                        }
                     }
+                }
+                catch
+                {
+                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "500");
+                    return 500;
                 }
             });
         }

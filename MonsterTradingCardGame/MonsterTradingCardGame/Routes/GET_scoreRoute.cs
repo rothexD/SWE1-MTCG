@@ -11,50 +11,58 @@ namespace MCTG.Routes
 {
     public static class GET_scoreRoute
     {
-        public static void registerRoute(ServerTcpListener server)
+        public static void RegisterRoute(ServerTcpListener server)
         {
             server.EndPointApi.RegisterEndPoint("GET", "^/score$", (IRequestContext httpRequest) =>
             {
-                NpgsqlConnection conn = DbHelper.ConnectObj();
-                conn.Open();
-
-                string querystringUnionAllCards = @$"select win,tie,lose,elo,LoginName from Scoreboard join users on scoreboard.LoginName_fk = users.LoginName order by elo desc,win desc";
-                using (NpgsqlCommand getScorebaord = new NpgsqlCommand(querystringUnionAllCards, conn))
+                try
                 {
-                    NpgsqlDataReader readergetScorebaord = getScorebaord.ExecuteReader();
-                    List<JsonScore> Scoreboard = new List<JsonScore>();
 
-                    while (readergetScorebaord.Read())
+                    NpgsqlConnection conn = DbHelper.ConnectObj();
+                    conn.Open();
+
+                    string querystringUnionAllCards = @$"select win,tie,lose,elo,LoginName from Scoreboard join users on scoreboard.LoginName_fk = users.LoginName order by elo desc,win desc,tie desc,lose asc";
+                    using (NpgsqlCommand getScorebaord = new NpgsqlCommand(querystringUnionAllCards, conn))
                     {
-                        var Score = new JsonScore();
-                        Score.Win = readergetScorebaord[0].ToString();
-                        Score.Lose = readergetScorebaord[1].ToString();
-                        Score.Tie = readergetScorebaord[2].ToString();
-                        Score.Elo = readergetScorebaord[3].ToString();
-                        Score.LoginName = readergetScorebaord[4].ToString();
-                        if ((Int32.Parse(Score.Lose) == 0 && Int32.Parse(Score.Tie) == 0))
+                        NpgsqlDataReader readergetScorebaord = getScorebaord.ExecuteReader();
+                        List<JsonScore> Scoreboard = new List<JsonScore>();
+
+                        while (readergetScorebaord.Read())
                         {
-                            if (Int32.Parse(Score.Win) > 0)
+                            var Score = new JsonScore();
+                            Score.Win = readergetScorebaord[0].ToString();                          
+                            Score.Tie = readergetScorebaord[1].ToString();
+                            Score.Lose = readergetScorebaord[2].ToString();
+                            Score.Elo = readergetScorebaord[3].ToString();
+                            Score.LoginName = readergetScorebaord[4].ToString();
+                            if ((Int32.Parse(Score.Lose) == 0 && Int32.Parse(Score.Tie) == 0))
                             {
-                                Score.WLTratio = 1;
+                                if (Int32.Parse(Score.Win) > 0)
+                                {
+                                    Score.WLTratio = 1;
+                                }
+                                else
+                                {
+                                    Score.WLTratio = 0;
+                                }
                             }
                             else
                             {
-                                Score.WLTratio = 0;
+                                Score.WLTratio = (Int32.Parse(Score.Win) / (Int32.Parse(Score.Lose) + Int32.Parse(Score.Tie)));
                             }
+                            Scoreboard.Add(Score);
                         }
-                        else
-                        {
-                            Score.WLTratio = (Int32.Parse(Score.Win) / (Int32.Parse(Score.Lose) + Int32.Parse(Score.Tie)));
-                        }
-                        Scoreboard.Add(Score);
+
+                        httpRequest.ReponseHandler.SendDefaultMessage(httpRequest.Stream, "200", JsonConvert.SerializeObject(Scoreboard, Formatting.Indented));
+                        conn.Close();
+                        return 200;
                     }
-
-                    httpRequest.ReponseHandler.SendDefaultMessage(httpRequest.Stream, "200", JsonConvert.SerializeObject(Scoreboard, Formatting.Indented));
-                    conn.Close();
-                    return 200;
                 }
-
+                catch
+                {
+                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "500");
+                    return 500;
+                }
             });
         }
     }

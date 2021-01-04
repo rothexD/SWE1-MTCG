@@ -17,16 +17,21 @@ namespace MCTG.FightHandlers
             Error
         }
 
-        public const int MaxRounds = 100;
+        public readonly int MaxRounds = 100;
         protected Random Dice;
-        private ConcurrentQueue<(Player, AutoResetEvent)> WaitingQue { get; set; }
+        private BlockingCollection<(Player, AutoResetEvent)> WaitingQue { get; set; }
 
         public FightHandler()
         {
-            Dice = new Random();
-            WaitingQue = new ConcurrentQueue<(Player, AutoResetEvent)>();
+            Dice = new Random(Guid.NewGuid().GetHashCode());
+            WaitingQue = new BlockingCollection<(Player, AutoResetEvent)>();
         }
-        public void startMatching()
+        public FightHandler(int PredfinedDice)
+        {
+            Dice = new Random(PredfinedDice);
+            WaitingQue = new BlockingCollection<(Player, AutoResetEvent)>();
+        }
+        public void StartMatching()
         {
             Thread startMatching = new Thread(delegate () { TryMatchmaking(); });
             startMatching.Start();
@@ -35,16 +40,9 @@ namespace MCTG.FightHandlers
         {
             while (true)
             {
-                (Player, AutoResetEvent) data1;
-                (Player, AutoResetEvent) data2;
-                while (!WaitingQue.TryDequeue(out data1))
-                {
-                    Thread.Sleep(1000);
-                }
-                while (!WaitingQue.TryDequeue(out data2))
-                {
-                    Thread.Sleep(1000);
-                }
+                (Player, AutoResetEvent) data1 = WaitingQue.Take();
+                (Player, AutoResetEvent) data2 = WaitingQue.Take();
+
                 Thread Fighthandler = new Thread(delegate () { Fighting(data1, data2); });
                 Fighthandler.Start();
             }
@@ -57,8 +55,8 @@ namespace MCTG.FightHandlers
             }
             if (!Fight(data1.Item1, data2.Item1))
             {
-                data1.Item1.status = BattleStatus.Error;
-                data2.Item1.status = BattleStatus.Error;
+                data1.Item1.Status = BattleStatus.Error;
+                data2.Item1.Status = BattleStatus.Error;
                 data1.Item2.Set();
                 data2.Item2.Set();
             }
@@ -68,9 +66,18 @@ namespace MCTG.FightHandlers
                 data2.Item2.Set();
             }
         }
-        public void addToList(Player player, AutoResetEvent Iam)
+        public bool QueUpForFight(Player player, AutoResetEvent Iam)
         {
-            WaitingQue.Enqueue((player, Iam));
+            if(player == null && Iam != null)
+            {
+                Iam.Set();
+                return false;
+            }else if( Iam == null)
+            {
+                return false;
+            }
+            WaitingQue.Add((player, Iam));
+            return true;
         }
         private
 
@@ -195,30 +202,30 @@ namespace MCTG.FightHandlers
             if (player1.Deck.Count == player2.Deck.Count)
             {
                 Battlelog += $"-------------------------------------------------------------------{Environment.NewLine}";
-                player1.assignedBattleLog = Battlelog;
-                player2.assignedBattleLog = Battlelog;
-                player2.status = FightHandler.BattleStatus.Tie;
-                player1.status = FightHandler.BattleStatus.Tie;
+                player1.AssignedBattleLog = Battlelog;
+                player2.AssignedBattleLog = Battlelog;
+                player2.Status = FightHandler.BattleStatus.Tie;
+                player1.Status = FightHandler.BattleStatus.Tie;
                 return true;
             }
             else if (player1.Deck.Count > player2.Deck.Count)
             {
                 Battlelog += $"-------------------------------------------------------------------{Environment.NewLine}";
                 Battlelog += $"Winner is {player1.UserName}{Environment.NewLine}";
-                player1.assignedBattleLog = Battlelog;
-                player2.assignedBattleLog = Battlelog;
-                player2.status = FightHandler.BattleStatus.Lose;
-                player1.status = FightHandler.BattleStatus.Win;
+                player1.AssignedBattleLog = Battlelog;
+                player2.AssignedBattleLog = Battlelog;
+                player2.Status = FightHandler.BattleStatus.Lose;
+                player1.Status = FightHandler.BattleStatus.Win;
                 return true;
             }
             else
             {
                 Battlelog += $"-------------------------------------------------------------------{Environment.NewLine}";
                 Battlelog += $"Winner is {player2.UserName}{Environment.NewLine}";
-                player1.assignedBattleLog = Battlelog;
-                player2.assignedBattleLog = Battlelog;
-                player2.status = FightHandler.BattleStatus.Win;
-                player1.status = FightHandler.BattleStatus.Lose;
+                player1.AssignedBattleLog = Battlelog;
+                player2.AssignedBattleLog = Battlelog;
+                player2.Status = FightHandler.BattleStatus.Win;
+                player1.Status = FightHandler.BattleStatus.Lose;
                 return true;
             }
         }

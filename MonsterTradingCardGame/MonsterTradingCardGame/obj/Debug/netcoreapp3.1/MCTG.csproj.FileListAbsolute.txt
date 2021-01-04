@@ -28,3 +28,4 @@ C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\MonsterTradingCardGame\MonsterTradin
 C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\MonsterTradingCardGame\MonsterTradingCardGame\obj\Debug\netcoreapp3.1\MCTG.dll
 C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\MonsterTradingCardGame\MonsterTradingCardGame\obj\Debug\netcoreapp3.1\MCTG.pdb
 C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\MonsterTradingCardGame\MonsterTradingCardGame\obj\Debug\netcoreapp3.1\MCTG.genruntimeconfig.cache
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\MonsterTradingCardGame\MonsterTradingCardGame\bin\Debug\netcoreapp3.1\helpFileJson.txt

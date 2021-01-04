@@ -10,11 +10,18 @@ namespace MCTG
     {
         public static readonly ServerTcpListener server = new ServerTcpListener("127.0.0.1", 10001);
         public static FightHandler fightApi = new FightHandler();
-
+        private static double Difference(DateTime early,DateTime later)
+        {
+            return later.Subtract(early).TotalMilliseconds;
+        }
         static void Main(string[] parameter)
         {
-            DbHelper.CreateTables();
-            POST_SessionRoute.registerRoute(server);
+            DateTime early;
+            DateTime later;
+
+            Console.WriteLine("Registering Routes...");
+            early = DateTime.Now;
+            POST_SessionRoute.RegisterRoute(server);
             /*server.EndPointApi.RegisterEndPoint("POST", "^/sessions$", (IRequestContext httpRequest) =>
             {
                 JsonSessions JsonData = JsonConvert.DeserializeObject<JsonSessions>(httpRequest.PayLoad);
@@ -48,7 +55,7 @@ namespace MCTG
                     }
                 }
             });*/
-            POST_packagesRoute.registerRoute(server);
+            POST_packagesRoute.RegisterRoute(server);
             /*server.EndPointApi.RegisterEndPoint("POST", "^/packages$", (IRequestContext httpRequest) =>
             {
                 httpRequest.Headers.TryGetValue("Authorization", out string token);
@@ -78,7 +85,7 @@ namespace MCTG
                 httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "201");
                 return 201;
             });*/
-            POST_packages_transactionsRoutecs.registerRoute(server);
+            POST_packages_transactionsRoutecs.RegisterRoute(server);
             /*server.EndPointApi.RegisterEndPoint("POST", "^/transactions/packages$", (IRequestContext httpRequest) =>
             {
                 string userID;
@@ -167,7 +174,7 @@ namespace MCTG
                 }
             });*/
 
-            GET_cardsRoute.registerRoute(server);
+            GET_cardsRoute.RegisterRoute(server);
             /*server.EndPointApi.RegisterEndPoint("GET", "^/cards$", (IRequestContext httpRequest) =>
             {
                 httpRequest.Headers.TryGetValue("Authorization", out string token);
@@ -210,7 +217,7 @@ namespace MCTG
                     }
                 }
             });*/
-            GET_deckRoute.registerRoute(server);
+            GET_deckRoute.RegisterRoute(server);
             /*server.EndPointApi.RegisterEndPoint("GET", "^/deck$", (IRequestContext httpRequest) =>
             {
                 httpRequest.Headers.TryGetValue("Authorization", out string token);
@@ -253,7 +260,7 @@ namespace MCTG
                     }
                 }
             });*/
-            GET_statsRoute.registerRoute(server);
+            GET_statsRoute.RegisterRoute(server);
             /*server.EndPointApi.RegisterEndPoint("GET", "^/stats$", (IRequestContext httpRequest) =>
             {
                 httpRequest.Headers.TryGetValue("Authorization", out string token);
@@ -321,7 +328,7 @@ namespace MCTG
             });*/
 
 
-            GET_scoreRoute.registerRoute(server);
+            GET_scoreRoute.RegisterRoute(server);
             /*server.EndPointApi.RegisterEndPoint("GET", "^/score$", (IRequestContext httpRequest) =>
             {
                 NpgsqlConnection conn = new NpgsqlConnection(connectstring);
@@ -366,7 +373,7 @@ namespace MCTG
 
             });*/
 
-            GET_users_anyRoute.registerRoute(server);
+            GET_users_anyRoute.RegisterRoute(server);
             /*server.EndPointApi.RegisterEndPoint("GET", "^/users/.+$", (IRequestContext httpRequest) =>
             {
                 httpRequest.Headers.TryGetValue("Authorization", out string token);
@@ -424,7 +431,7 @@ namespace MCTG
                     }
                 }
             });*/
-            PUT_users_anyRoute.registerRoute(server);
+            PUT_users_anyRoute.RegisterRoute(server);
             /*server.EndPointApi.RegisterEndPoint("PUT", "^/users/.+$", (IRequestContext httpRequest) =>
             {
                 httpRequest.Headers.TryGetValue("Authorization", out string token);
@@ -481,7 +488,7 @@ namespace MCTG
                     }
                 }
             });*/
-            PUT_deckRoute.registerRoute(server);
+            PUT_deckRoute.RegisterRoute(server);
             /*server.EndPointApi.RegisterEndPoint("PUT", "^/deck$", (IRequestContext httpRequest) =>
             {
                 httpRequest.Headers.TryGetValue("Authorization", out string token);
@@ -566,7 +573,7 @@ namespace MCTG
             });*/
 
 
-            GET_tradingsRoute.registerRoute(server);
+            GET_tradingsRoute.RegisterRoute(server);
             /*server.EndPointApi.RegisterEndPoint("GET", "^/tradings$", (IRequestContext httpRequest) =>
             {
                 NpgsqlConnection conn = new NpgsqlConnection(connectstring);
@@ -592,7 +599,7 @@ namespace MCTG
                 }
             });*/
 
-            DELETE_tradings_anyRoute.registerRoute(server);
+            DELETE_tradings_anyRoute.RegisterRoute(server);
             /*server.EndPointApi.RegisterEndPoint("Delete", "^/tradings/.+$", (IRequestContext httpRequest) =>
             {
                 httpRequest.Headers.TryGetValue("Authorization", out string token);
@@ -634,7 +641,7 @@ namespace MCTG
                 return 200;
             });*/
 
-            POST_tradingsRoute.registerRoute(server);
+            POST_tradingsRoute.RegisterRoute(server);
             /*server.EndPointApi.RegisterEndPoint("POST", "^/tradings$", (IRequestContext httpRequest) =>
             {
                 httpRequest.Headers.TryGetValue("Authorization", out string token);
@@ -689,7 +696,7 @@ namespace MCTG
                     return 201;
                 }
             });*/
-            POST_tradings_anyRoute.registerRoute(server);
+            POST_tradings_anyRoute.RegisterRoute(server);
             /*server.EndPointApi.RegisterEndPoint("POST", "^/tradings/.+$", (IRequestContext httpRequest) =>
             {
                 httpRequest.Headers.TryGetValue("Authorization", out string token);
@@ -807,7 +814,7 @@ namespace MCTG
                     }
                 }
             });*/
-            POST_usersRoute.registerRoute(server);
+            POST_usersRoute.RegisterRoute(server);
             /*server.EndPointApi.RegisterEndPoint("POST", "^/users$", (IRequestContext httpRequest) =>
             {
                 JsonRegisterUser Data = JsonConvert.DeserializeObject<JsonRegisterUser>(httpRequest.PayLoad);
@@ -838,7 +845,7 @@ namespace MCTG
                     }
                 }
             });*/
-            POST_battlesRoute.registerRoute(server);
+            POST_battlesRoute.RegisterRoute(server);
             /*server.EndPointApi.RegisterEndPoint("POST", "^/battles$", (IRequestContext httpRequest) =>
              {
                  httpRequest.Headers.TryGetValue("Authorization", out string token);
@@ -954,9 +961,30 @@ namespace MCTG
                          return 500;
                  }
              });*/
+            GET_helpRoute.RegisterRoute(server);
+            GET_helloRoute.RegisterRoute(server);
 
-            Console.WriteLine("Start Matching....");
-            fightApi.startMatching();
+            later = DateTime.Now;
+            Console.WriteLine($"Took: {Difference(early, later)} millSeconds");
+
+
+            
+            Console.WriteLine("Trying to connect to database and define table setup....");
+            early = DateTime.Now;
+            DbHelper.CreateTables();
+            later = DateTime.Now;
+            Console.WriteLine($"Took: {Difference(early, later)} millSeconds");
+
+
+
+            Console.WriteLine("Starting Matching Thread....");
+            early = DateTime.Now;
+            fightApi.StartMatching();
+            later = DateTime.Now;
+            Console.WriteLine($"Took: {Difference(early, later)} millSeconds");
+
+
+
             Console.WriteLine("listening for connections....");
             server.ListenForConnections();
         }

@@ -11,71 +11,79 @@ namespace MCTG.Routes
 {
     public static class GET_statsRoute
     {
-        public static void registerRoute(ServerTcpListener server)
+        public static void RegisterRoute(ServerTcpListener server)
         {
             server.EndPointApi.RegisterEndPoint("GET", "^/stats$", (IRequestContext httpRequest) =>
             {
-                httpRequest.Headers.TryGetValue("Authorization", out string token);
-                if (!Regex.IsMatch(token, "^Basic (.*)-mtcgToken$"))
+                try
                 {
-                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
-                    return 400;
-                }
-
-                string querystring = @$"select LoginName from users where LoginName='{Regex.Match(token, "^Basic (.*)-mtcgToken$").Groups[1].Value}'";
-                NpgsqlConnection conn = DbHelper.ConnectObj();
-                conn.Open();
-
-                using (NpgsqlCommand command = new NpgsqlCommand(querystring, conn))
-                {
-                    NpgsqlDataReader reader = command.ExecuteReader();
-                    if (reader.HasRows == false)
+                    httpRequest.Headers.TryGetValue("Authorization", out string token);
+                    if (!Regex.IsMatch(token, "^Basic (.*)-mtcgToken$"))
                     {
                         httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
-                        conn.Close();
                         return 400;
                     }
-                    reader.Read();
-                    string UserID = reader[0].ToString();
-                    reader.Close();
 
-                    string querystringUnionAllCards = @$"select win,tie,lose,elo from Scoreboard where LoginName_fk = '{UserID}'";
-                    using (NpgsqlCommand getStats = new NpgsqlCommand(querystringUnionAllCards, conn))
+                    string querystring = @$"select LoginName from users where LoginName='{Regex.Match(token, "^Basic (.*)-mtcgToken$").Groups[1].Value}'";
+                    NpgsqlConnection conn = DbHelper.ConnectObj();
+                    conn.Open();
+
+                    using (NpgsqlCommand command = new NpgsqlCommand(querystring, conn))
                     {
-                        NpgsqlDataReader readergetStats = getStats.ExecuteReader();
-                        if (readergetStats.HasRows == false)
+                        NpgsqlDataReader reader = command.ExecuteReader();
+                        if (reader.HasRows == false)
                         {
-                            httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
-                            return 400;
+                            httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "401");
+                            conn.Close();
+                            return 401;
                         }
-                        readergetStats.Read();
-                        var Score = new JsonScore();
-                        Score.Win = readergetStats[0].ToString();
-                        Score.Lose = readergetStats[1].ToString();
-                        Score.Tie = readergetStats[2].ToString();
-                        Score.Elo = readergetStats[3].ToString();
-                        if ((Int32.Parse(Score.Lose) == 0 && Int32.Parse(Score.Tie) == 0))
+                        reader.Read();
+                        string UserID = reader[0].ToString();
+                        reader.Close();
+
+                        string querystringUnionAllCards = @$"select win,tie,lose,elo from Scoreboard where LoginName_fk = '{UserID}'";
+                        using (NpgsqlCommand getStats = new NpgsqlCommand(querystringUnionAllCards, conn))
                         {
-                            if (Int32.Parse(Score.Win) > 0)
+                            NpgsqlDataReader readergetStats = getStats.ExecuteReader();
+                            if (readergetStats.HasRows == false)
                             {
-                                Score.WLTratio = 1;
+                                httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "404");
+                                return 404;
+                            }
+                            readergetStats.Read();
+                            var Score = new JsonScore();
+                            Score.Win = readergetStats[0].ToString();                         
+                            Score.Tie = readergetStats[1].ToString();
+                            Score.Lose = readergetStats[2].ToString();
+                            Score.Elo = readergetStats[3].ToString();
+                            if ((Int32.Parse(Score.Lose) == 0 && Int32.Parse(Score.Tie) == 0))
+                            {
+                                if (Int32.Parse(Score.Win) > 0)
+                                {
+                                    Score.WLTratio = 1;
+                                }
+                                else
+                                {
+                                    Score.WLTratio = 0;
+                                }
                             }
                             else
                             {
-                                Score.WLTratio = 0;
+                                Score.WLTratio = (Int32.Parse(Score.Win) / (Int32.Parse(Score.Lose) + Int32.Parse(Score.Tie)));
                             }
+
+
+
+                            httpRequest.ReponseHandler.SendDefaultMessage(httpRequest.Stream, "200", JsonConvert.SerializeObject(Score, Formatting.Indented));
+                            conn.Close();
+                            return 200;
                         }
-                        else
-                        {
-                            Score.WLTratio = (Int32.Parse(Score.Win) / (Int32.Parse(Score.Lose) + Int32.Parse(Score.Tie)));
-                        }
-
-
-
-                        httpRequest.ReponseHandler.SendDefaultMessage(httpRequest.Stream, "200", JsonConvert.SerializeObject(Score, Formatting.Indented));
-                        conn.Close();
-                        return 200;
                     }
+                }
+                catch
+                {
+                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "500");
+                    return 500;
                 }
             });
         }
