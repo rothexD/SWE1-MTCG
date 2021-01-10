@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "jrZVqIfPPwov3XOI2/E1k5tDsn0rSToNpd/1X/8WZY2yk2Y04Nvp6NPj/1Mdmhx7fbHwVOnE0SAMpCvRzFOHxg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\rothexD\\Documents\\GitHub\\SWE1-MTCG\\MonsterTradingCardGame\\MonsterTradingCardGame\\MCTG.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\rothexD\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
+    "C:\\Users\\rothexD\\.nuget\\packages\\npgsql\\5.0.1.1\\npgsql.5.0.1.1.nupkg.sha512",
+    "C:\\Users\\rothexD\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.6.0\\system.runtime.compilerservices.unsafe.4.6.0.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -5,6 +5,9 @@ using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 using Restservice.Http_Service;
+using Restservice.MockHelper;
+
+
 namespace Restservice.Server
 {
     public class ServerTcpListener 
@@ -28,12 +31,12 @@ namespace Restservice.Server
             Server = new TcpListener(Adress, port);
             this.EndPointApi = new EndPointApi<IRequestContext, int>();
         }
-        public void StartServer()
-        {
-            Server.Start();
-        }
         public void ListenForConnections()
         {
+            //start server
+            Server.Start();
+
+            //listen for incoming connection and start a thread that handels the connection (functioon processconnection)
             while (true)
             {
                 IMyTcpClient client = new MyTcpClient(Server.AcceptTcpClient());
@@ -43,6 +46,7 @@ namespace Restservice.Server
         }
         protected IRequestContext GetRequestInformationFromConnection(IMyTcpClient client)
         {
+            //creates RequestContext and parses the stream into it
             if (client == null)
             {
                 return null; 
@@ -93,17 +97,18 @@ namespace Restservice.Server
             IRequestContext httpRequest = GetRequestInformationFromConnection(client);
             try
             {
-                
+                //if couldnt parse return error message
                 if (httpRequest != null)
                 {
                     PrintConnectionDetails(httpRequest);
                 }
                 else
                 {
-                    httpRequest.ReponseHandler.SendDefaultStatus("400");
                     client.Close();
                     return false;
-                }       
+                }    
+                
+                // evoke endpoint for requested resource
                 int statusCode = EndPointApi.InvokeEndPoint(httpRequest.HTTPVerb, httpRequest.MessageEndPoint, httpRequest);
                 if (statusCode == -1)
                 {
@@ -113,24 +118,27 @@ namespace Restservice.Server
             }
             catch (SocketException)
             {
+                //couldnt write to stream
                 client.Close();
                 return false;
             }
             catch(ArgumentNullException)
             {
+                // null was given as argument
                 client.Close();
                 return false;
             }
             catch(Exception e) when (e.Message == "NotAValidEndpoint")
             {
-
-                httpRequest.ReponseHandler.SendDefaultStatus("404");
+                // ResourceEndpoint was not found in Endpoint Api
+                httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream,"404");
                 client.Close();
                 return false;
             }
             catch(Exception e) when (e.Message == "NotAValidVerbForEndpoint")
             {
-                httpRequest.ReponseHandler.SendDefaultStatus("501");
+                // HTTP verb not registered for that resource endpoint
+                httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream,"501");
                 client.Close();
                 return false;
             }

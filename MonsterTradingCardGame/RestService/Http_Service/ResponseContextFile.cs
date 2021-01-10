@@ -5,26 +5,18 @@ using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 using Restservice.Server;
+using Restservice.MockHelper;
+
 namespace Restservice.Http_Service
 {
-    public interface IHTTPResponseWrapper
-    {
-        public void ResetContext();
-        public bool SendResponseByTcp(string StatusCode);
-        public bool SendMessageByTcp(string StatusCode, string Message);
-        public bool SendDefaultStatus(string StatusCode);
-        public bool SendDefaultMessage(string StatusCode, string Message);
-        public IMyNetWorkStream Stream { get; }
-    }
+    
     public class HTTPResponseWrapper : IHTTPResponseWrapper
     {
         public Dictionary<string, string> DicionaryHeaders { get; set; }
-        public IMyNetWorkStream Stream { get; private set; }
 
-        public HTTPResponseWrapper(IMyNetWorkStream Stream)
+        public HTTPResponseWrapper()
         {
             DicionaryHeaders = new Dictionary<string, string>();
-            this.Stream = Stream;
             ResetContext();
         }
         public void ResetContext()
@@ -40,10 +32,16 @@ namespace Restservice.Http_Service
                 case ("404"): return "Not Found";
                 case ("201"): return "Created";
                 case ("501"): return "Not Implemented";
+                case ("202"): return "Accepted";
+                case ("403"): return "Forbidden";
+                case ("409"): return "Conflict";
+                case ("500"): return "Internal Server Error";
+                case ("401"): return "Unauthorized";
+
                 default: return "Unknown StatusCode";
             }
         }
-        public bool SendResponseByTcp(string statusCode)
+        public bool SendResponseByTcp(IMyNetWorkStream stream,string statusCode)
         {
             if (statusCode == "")
             {
@@ -58,7 +56,7 @@ namespace Restservice.Http_Service
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(response);
             try
             {
-                Stream.Write(msg, 0, msg.Length);
+                stream.Write(msg, 0, msg.Length);
             }
             catch
             {
@@ -66,7 +64,7 @@ namespace Restservice.Http_Service
             }
             return true;
         }
-        public bool SendMessageByTcp(string statusCode, string message)
+        public bool SendMessageByTcp(IMyNetWorkStream stream, string statusCode, string message)
         {
             if (statusCode == "")
             {
@@ -77,11 +75,12 @@ namespace Restservice.Http_Service
             {
                 response += $"{item.Key}: {item.Value}\r\n";
             }
+            response += "\r\n";
             response += $"Content-Length: {message.Length}\r\n\r\n{message}";
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(response);
             try
             {
-                Stream.Write(msg, 0, msg.Length);
+                stream.Write(msg, 0, msg.Length);
             }
             catch
             {
@@ -90,17 +89,17 @@ namespace Restservice.Http_Service
             
             return true;
         }
-        public bool SendDefaultStatus(string statusCode)
+        public bool SendDefaultStatus(IMyNetWorkStream stream,string statusCode)
         {
             if (statusCode == "")
             {
                 return false;
             }
-            string response = $"HTTP/1.1 {statusCode} {ResolveHTTPStatuscode(statusCode)}\r\nCache-Control: no-cache\nDate: {DateTime.Now}\r\nConnection: Closed";
+            string response = $"HTTP/1.1 {statusCode} {ResolveHTTPStatuscode(statusCode)}\r\nCache-Control: no-cache\nDate: {DateTime.Now}\r\nConnection: Closed\r\n\r\n";
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(response);
             try
             {
-                Stream.Write(msg, 0, msg.Length);
+                stream.Write(msg, 0, msg.Length);
             }
             catch
             {
@@ -108,17 +107,17 @@ namespace Restservice.Http_Service
             }
             return true;
         }
-        public bool SendDefaultMessage(string statusCode, string message)
+        public bool SendDefaultMessage(IMyNetWorkStream stream,string statusCode, string message)
         {
             if (statusCode == "")
             {
                 return false;
             }
-            string response = $"HTTP/1.1 {statusCode} {ResolveHTTPStatuscode(statusCode)}\r\nCache-Control: no-cache\r\nDate: {DateTime.Now}\r\nConnection: Closed\r\nContent-Type: raw\r\nContent-Length: {message.Length}\r\n\r\n{message}";
+            string response = $"HTTP/1.1 {statusCode} {ResolveHTTPStatuscode(statusCode)}\r\nCache-Control: no-cache\r\nDate: {DateTime.Now}\r\nConnection: Closed\r\nContent-Type: application/json\r\nContent-Length: {message.Length}\r\n\r\n{message}";
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(response);
             try
             {
-                Stream.Write(msg, 0, msg.Length);
+                stream.Write(msg, 0, msg.Length);
             }
             catch
             {

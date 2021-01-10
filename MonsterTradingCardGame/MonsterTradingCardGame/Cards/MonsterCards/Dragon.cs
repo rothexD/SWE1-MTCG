@@ -5,7 +5,7 @@ namespace MCTG.Cards.MonsterCards
     public class Dragon : Card
     {
         private Random RandomNumberGenerator = new Random();
-        public Dragon(int Basedamage, string Name, int CardId, CardelEmentEnum Element) : base(CardId)
+        public Dragon(int Basedamage, string Name, string CardId, CardelEmentEnum Element) : base(CardId)
         {
             this.BaseDamage = Basedamage;
             this.CardName = Name;

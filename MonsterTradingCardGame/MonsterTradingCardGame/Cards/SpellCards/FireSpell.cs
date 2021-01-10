@@ -4,7 +4,7 @@ namespace MCTG.Cards.SpellCards
 {
     public class FireSpell : Card
     {
-        public FireSpell(int Basedamage, string Name, int CardId, CardelEmentEnum Element) : base(CardId)
+        public FireSpell(int Basedamage, string Name, string CardId, CardelEmentEnum Element) : base(CardId)
         {
             this.BaseDamage = Basedamage;
             this.CardName = Name;

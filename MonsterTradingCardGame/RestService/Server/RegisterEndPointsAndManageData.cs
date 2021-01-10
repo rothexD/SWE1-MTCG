@@ -12,6 +12,7 @@ namespace Restservice.Server
 {
     public class RegisterEndPointsAndManageData
     {
+        //basic storage api, was created for mocking reasons and because the lambda scope was to complex to understand
         public MessageStorageApi Storage { get; set; }
         
         public RegisterEndPointsAndManageData(ref MessageStorageApi storage )
@@ -23,8 +24,10 @@ namespace Restservice.Server
             Storage = new MessageStorageApi();
         }
 
+        //registers endpoints
         public void ChainRegisterEndpoints(ref ServerTcpListener server)
         {
+            // registers basic get endpoint where all messages are shown
             server.EndPointApi.RegisterEndPoint("GET", "^/messages$", (IRequestContext httpRequest) =>
             {
                 string response = "";
@@ -37,13 +40,14 @@ namespace Restservice.Server
                 Storage.MessageListMutex.ReleaseMutex();
                 //respond with OK Message
 
-                if(!httpRequest.ReponseHandler.SendDefaultMessage("200", response))
+                if(!httpRequest.ReponseHandler.SendDefaultMessage(httpRequest.Stream,"200", response))
                 {
                     return -1;
                 }                          
                 return 200;
             });
 
+            //registers endpoint where specific message is shown
             server.EndPointApi.RegisterEndPoint("GET", "^/messages/[0-9]+$", (IRequestContext httpRequest) =>
             {
 
@@ -58,25 +62,26 @@ namespace Restservice.Server
                         Storage.MessageListMutex.ReleaseMutex();
                         string Response = $"Message {messageIDFromHttpRequest}: {output}\n";
                         //respond with OK Message
-                        httpRequest.ReponseHandler.SendDefaultMessage("200", Response);
+                        httpRequest.ReponseHandler.SendDefaultMessage(httpRequest.Stream, "200", Response);
                         return 200;
                     }
                     else
                     {
                         Storage.MessageListMutex.ReleaseMutex();
                         //respond Message not found;
-                        httpRequest.ReponseHandler.SendDefaultStatus("404");
+                        httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "404");
                         return 404;
                     }
                 }
                 else
                 {
                     //respond with bad Formatting
-                    httpRequest.ReponseHandler.SendDefaultStatus("400");
+                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
                     return 400;
                 }
             });
 
+            //registers endpoint that allowes posting 
             server.EndPointApi.RegisterEndPoint("POST", "^/messages$", (IRequestContext httpRequest) =>
             {
                 Storage.MessageListMutex.WaitOne();
@@ -84,10 +89,11 @@ namespace Restservice.Server
                 int tempMessageCounter = Storage.MessageCounter;
                 Storage.MessageCounter++;
                 Storage.MessageListMutex.ReleaseMutex();
-                httpRequest.ReponseHandler.SendDefaultMessage("201", tempMessageCounter.ToString());
+                httpRequest.ReponseHandler.SendDefaultMessage(httpRequest.Stream, "201", tempMessageCounter.ToString());
                 return 201;
             });
 
+            //registers endpoint that deletes specific message
             server.EndPointApi.RegisterEndPoint("DELETE", "^/messages/[0-9]+$", (IRequestContext httpRequest) =>
             {
                 string[] endPointArray = httpRequest.MessageEndPoint.Split('/');
@@ -98,25 +104,31 @@ namespace Restservice.Server
                     if (Storage.MessageList.ContainsKey(messageIDFromHttpRequest))
                     {
                         Storage.MessageList.Remove(messageIDFromHttpRequest);
+
+                        //need to either sort or create a new Dictionary, issue: if u delete a message and post a new one it will no longer be in order
+                        Storage.MessageList = new Dictionary<int, string>(Storage.MessageList);
+
                         Storage.MessageListMutex.ReleaseMutex();
-                        httpRequest.ReponseHandler.SendDefaultStatus("200");
+                        httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "200");
                         return 200;
                     }
                     else
                     {
                         Storage.MessageListMutex.ReleaseMutex();
                         //respond with bad MessageEndPoint
-                        httpRequest.ReponseHandler.SendDefaultStatus("404");
+                        httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "404");
                         return 404;
                     }
                 }
                 else
                 {
                     //respond with bad Formatting
-                    httpRequest.ReponseHandler.SendDefaultStatus("400");
+                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
                     return 400;
                 }
             });
+
+            //update a specific message if it exists in message list
             server.EndPointApi.RegisterEndPoint("PUT", "^/messages/[0-9]+$", (IRequestContext httpRequest) =>
             {
                 string[] endPointArray = httpRequest.MessageEndPoint.Split('/');
@@ -129,21 +141,21 @@ namespace Restservice.Server
                         Storage.MessageList[messageIDFromHttpRequest] = httpRequest.PayLoad;
                         Storage.MessageListMutex.ReleaseMutex();
                         //respond with ok
-                        httpRequest.ReponseHandler.SendDefaultStatus("200");
+                        httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "200");
                         return 200;
                     }
                     else
                     {
                         Storage.MessageListMutex.ReleaseMutex();
                         //respond with bad MessageEndPoint
-                        httpRequest.ReponseHandler.SendDefaultStatus("404");
+                        httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "404");
                         return 404;
                     }
                 }
                 else
                 {
                     //respond with bad Formatting
-                    httpRequest.ReponseHandler.SendDefaultStatus("400");
+                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
                     return 400;
                 }
             });

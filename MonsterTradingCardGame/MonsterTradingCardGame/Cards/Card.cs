@@ -13,7 +13,7 @@
         public string CardName { get; protected set; }
         public string CardStyle { get; protected set; }
         public CardelEmentEnum CardElement { get; protected set; }
-        public int CardId { get; private set; }
+        public string CardId { get; private set; }
         public string AttackMoveName { get; protected set; }
         protected float ElementMultiplikator(Card OpponentCard)
         {
@@ -51,7 +51,7 @@
             }
         }
         public abstract int CalculateDamage(Card Opponentscard);
-        protected Card(int CardId)
+        protected Card(string CardId)
         {
             this.CardId = CardId;
         }
