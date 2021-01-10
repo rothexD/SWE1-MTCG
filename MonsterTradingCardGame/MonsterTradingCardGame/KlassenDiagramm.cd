@@ -1,0 +1,298 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="MCTG.Programm" Collapsed="true">
+    <Position X="35.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAABBAAAAAI=</HashCode>
+      <FileName>Programm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Cards.MonsterCards.Dragon" Collapsed="true">
+    <Position X="7.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>Cards\MonsterCards\Dragon.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Cards.MonsterCards.FireElve" Collapsed="true">
+    <Position X="12.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>Cards\MonsterCards\FireElve.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Cards.MonsterCards.Goblin" Collapsed="true">
+    <Position X="16.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>Cards\MonsterCards\Goblin.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Cards.MonsterCards.Knight" Collapsed="true">
+    <Position X="21.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>Cards\MonsterCards\Knight.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Cards.MonsterCards.Kraken" Collapsed="true">
+    <Position X="23.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>Cards\MonsterCards\Kraken.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Cards.MonsterCards.Ork" Collapsed="true">
+    <Position X="25.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>Cards\MonsterCards\Ork.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Cards.MonsterCards.Wizzard" Collapsed="true">
+    <Position X="5.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>Cards\MonsterCards\Wizzard.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Cards.SpellCards.FireSpell" Collapsed="true">
+    <Position X="10" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>Cards\SpellCards\FireSpell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Cards.SpellCards.NormalSpell" Collapsed="true">
+    <Position X="14.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>Cards\SpellCards\NormalSpell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Cards.SpellCards.WaterSpell" Collapsed="true">
+    <Position X="19" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>Cards\SpellCards\WaterSpell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Cards.Card" Collapsed="true">
+    <Position X="15.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAEAAAAAIAAAAAAAAAAAAAAAAgEAAIAAAAAAAgAAQQ=</HashCode>
+      <FileName>Cards\Card.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Cards.CardHelpers" Collapsed="true">
+    <Position X="28.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Cards\CardHelpers.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.DbHelpers.DbHelper" Collapsed="true">
+    <Position X="30" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAARAAAAAAAAAAABAEACAQAAAAAAAA=</HashCode>
+      <FileName>DbHelper\DBHelpers.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.FightHandlers.FightHandler" Collapsed="true">
+    <Position X="33.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAABAIBAQAAQAAAAAAAQAEAAAAAAAAAAEEQAA=</HashCode>
+      <FileName>FightHandlers\Fighthandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.JsonHelper.JsonPackages" Collapsed="true">
+    <Position X="28.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAgAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>JsonHelper\JsonPackages.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.JsonHelper.JsonProfileData" Collapsed="true">
+    <Position X="30" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAQAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>JsonHelper\JsonProfileData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.JsonHelper.JsonProfileDataExtended" Collapsed="true">
+    <Position X="31.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAACAAACAQAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>JsonHelper\JsonProfileDataExtended.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.JsonHelper.JsonRegisterUser" Collapsed="true">
+    <Position X="33.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>JsonHelper\JsonRegisterUser.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.JsonHelper.JsonScore" Collapsed="true">
+    <Position X="35.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAQQAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>JsonHelper\JsonScore.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.JsonHelper.JsonSessions" Collapsed="true">
+    <Position X="37" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>JsonHelper\JsonSessions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.JsonHelper.JsonTradingHelper" Collapsed="true">
+    <Position X="28.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAgAAAAACAAAAAAAAAIAAAAAgAAAAAAgAAAAAAA=</HashCode>
+      <FileName>JsonHelper\JsonTradingHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.JsonHelper.JsonTradingOffer" Collapsed="true">
+    <Position X="30" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAABAAAAAAAAAQAAAAAAIAA=</HashCode>
+      <FileName>JsonHelper\JsonTradingOffer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Players.Player" Collapsed="true">
+    <Position X="31.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAACAAAAAAAAAAAAAAAAAQBIAAAAAAA=</HashCode>
+      <FileName>Player\Player.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.DELETE_tradings_anyRoute" Collapsed="true">
+    <Position X="31.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\DELETE_tradings_anyRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.GET_cardsRoute" Collapsed="true">
+    <Position X="35.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\GET_cardsRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.GET_deckRoute" Collapsed="true">
+    <Position X="37" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\GET_deckRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.GET_helloRoute" Collapsed="true">
+    <Position X="28.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\GET_helloRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.GET_helpRoute" Collapsed="true">
+    <Position X="30" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\GET_helpRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.GET_scoreRoute" Collapsed="true">
+    <Position X="31.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\GET_scoreRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.GET_statsRoute" Collapsed="true">
+    <Position X="33.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\GET_statsRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.GET_tradingsRoute" Collapsed="true">
+    <Position X="35.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\GET_tradingsRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.GET_users_anyRoute" Collapsed="true">
+    <Position X="37" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\GET_users_anyRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.POST_battlesRoute" Collapsed="true">
+    <Position X="33.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\POST_battlesRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.POST_packages_transactionsRoutecs" Collapsed="true">
+    <Position X="35.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\POST_packages_transactionsRoutecs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.POST_packagesRoute" Collapsed="true">
+    <Position X="37" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\POST_packagesRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.POST_SessionRoute" Collapsed="true">
+    <Position X="28.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\POST_SessionRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.POST_tradings_anyRoute" Collapsed="true">
+    <Position X="30" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\POST_tradings_anyRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.POST_tradingsRoute" Collapsed="true">
+    <Position X="31.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\POST_tradingsRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.POST_usersRoute" Collapsed="true">
+    <Position X="33.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\POST_usersRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.PUT_deckRoute" Collapsed="true">
+    <Position X="37" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\PUT_deckRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MCTG.Routes.PUT_users_anyRoute" Collapsed="true">
+    <Position X="28.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Routes\PUT_users_anyRoute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

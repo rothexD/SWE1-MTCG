@@ -17,8 +17,8 @@ namespace MCTG.Routes
                     httpRequest.Headers.TryGetValue("Authorization", out string token);
                     if (!Regex.IsMatch(token, "Basic admin-mtcgToken"))
                     {
-                        httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "405");
-                        return 405;
+                        httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "401");
+                        return 401;
                     }
 
                     NpgsqlConnection conn = DbHelper.ConnectObj();
@@ -43,8 +43,8 @@ namespace MCTG.Routes
                 }
                 catch
                 {
-                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "500");
-                    return 500;
+                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
+                    return 400;
                 }
             });
         }

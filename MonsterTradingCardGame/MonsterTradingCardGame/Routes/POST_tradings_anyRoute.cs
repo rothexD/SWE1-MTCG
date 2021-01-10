@@ -130,8 +130,8 @@ namespace MCTG.Routes
                 }
                 catch
                 {
-                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "500");
-                    return 500;
+                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
+                    return 400;
                 }
             });
         }

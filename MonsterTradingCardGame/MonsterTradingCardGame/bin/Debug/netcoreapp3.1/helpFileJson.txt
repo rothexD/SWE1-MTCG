@@ -110,5 +110,12 @@
     "Headers":"token",
     "Payload":"JsonObj;string:Name,string:Bio,string:Image",
     "Description":"Update profile data"
+  },
+  {
+    "Route":"/hello",
+    "Verb":"GET",
+    "Headers":"",
+    "Payload":"",
+    "Description":"Says Hello!"
   }
 ]

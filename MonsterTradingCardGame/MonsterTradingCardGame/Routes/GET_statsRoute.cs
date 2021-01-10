@@ -56,6 +56,7 @@ namespace MCTG.Routes
                             Score.Tie = readergetStats[1].ToString();
                             Score.Lose = readergetStats[2].ToString();
                             Score.Elo = readergetStats[3].ToString();
+                            Score.LoginName = UserID;
                             if ((Int32.Parse(Score.Lose) == 0 && Int32.Parse(Score.Tie) == 0))
                             {
                                 if (Int32.Parse(Score.Win) > 0)
@@ -82,8 +83,8 @@ namespace MCTG.Routes
                 }
                 catch
                 {
-                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "500");
-                    return 500;
+                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
+                    return 400;
                 }
             });
         }

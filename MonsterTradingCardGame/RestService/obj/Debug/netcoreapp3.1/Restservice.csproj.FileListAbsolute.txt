@@ -21,3 +21,4 @@ C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\MonsterTradingCardGame\RestService\o
 C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\MonsterTradingCardGame\RestService\obj\Debug\netcoreapp3.1\Restservice.dll
 C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\MonsterTradingCardGame\RestService\obj\Debug\netcoreapp3.1\Restservice.pdb
 C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\MonsterTradingCardGame\RestService\obj\Debug\netcoreapp3.1\Restservice.genruntimeconfig.cache
+C:\Users\rothexD\Documents\GitHub\SWE1-MTCG\MonsterTradingCardGame\RestService\obj\Debug\netcoreapp3.1\Restservice.csprojAssemblyReference.cache

@@ -180,7 +180,7 @@ namespace MCTG.FightHandlers
             BattlelogHeader(PlayerTurn, ref player1, ref player2, ref Battlelog);
             for (int RoundCounter = 0; RoundCounter < MaxRounds; RoundCounter++)
             {
-                if (player1.Deck.Count == 0 || player1.Deck.Count == 0)
+                if (player1.Deck.Count == 0 || player2.Deck.Count == 0)
                 {
                     break;
                 }
@@ -193,9 +193,8 @@ namespace MCTG.FightHandlers
                 else
                 {
                     Battlelog += $"{Environment.NewLine}Round{RoundCounter} Atacker: {player2.UserName}, Defender: {player1.UserName}{Environment.NewLine}";
-                    FightOneRound(ref player1, ref player2, ref Battlelog);
+                    FightOneRound(ref player2, ref player1, ref Battlelog);
                 }
-
                 Battlelog += $"{Environment.NewLine}";
                 PlayerTurn = !PlayerTurn;
             }

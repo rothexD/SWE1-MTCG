@@ -55,9 +55,9 @@ namespace MCTG.Routes
                                      NpgsqlDataReader readerPackageString = command2.ExecuteReader();
                                      if (readerPackageString.HasRows == false)
                                      {
-                                         httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "409");
+                                         httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "404");
                                          conn.Close();
-                                         return 409;
+                                         return 404;
                                      }
                                      readerPackageString.Read();
                                      string PackageID = readerPackageString[0].ToString();
@@ -94,8 +94,8 @@ namespace MCTG.Routes
                          }
                          catch
                          {
-                             httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "500");
-                             return 500;
+                             httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
+                             return 400;
                          }
                      });
         }

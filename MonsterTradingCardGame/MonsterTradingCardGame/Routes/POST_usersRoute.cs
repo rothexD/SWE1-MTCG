@@ -28,9 +28,9 @@ namespace MCTG.Routes
                         }
                         catch
                         {
-                            httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "500");
+                            httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "409");
                             conn.Close();
-                            return 500;
+                            return 409;
                         }
 
                         querystring = $"Insert into Scoreboard (LoginName_fk) values('{Data.Username}')";
@@ -45,8 +45,8 @@ namespace MCTG.Routes
                 }
                 catch
                 {
-                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "500");
-                    return 500;
+                    httpRequest.ReponseHandler.SendDefaultStatus(httpRequest.Stream, "400");
+                    return 400;
                 }
             });
         }

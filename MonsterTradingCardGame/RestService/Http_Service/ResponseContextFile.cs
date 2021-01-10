@@ -34,7 +34,9 @@ namespace Restservice.Http_Service
                 case ("501"): return "Not Implemented";
                 case ("202"): return "Accepted";
                 case ("403"): return "Forbidden";
+                case ("409"): return "Conflict";
                 case ("500"): return "Internal Server Error";
+                case ("401"): return "Unauthorized";
 
                 default: return "Unknown StatusCode";
             }
